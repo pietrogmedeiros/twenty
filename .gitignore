@@ -63,3 +63,6 @@ screenshots/
 
 # local graphify knowledge-graph output (never commit)
 **/graphify-out/
+precatur-build/.apikey
+
+.maestri/

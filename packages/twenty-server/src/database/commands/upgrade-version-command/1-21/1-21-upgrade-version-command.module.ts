@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkspaceIteratorModule } from 'src/database/commands/command-runners/workspace-iterator.module';
 import { RefactorNavigationCommandsCommand } from 'src/database/commands/upgrade-version-command/1-21/1-21-workspace-command-1775500013000-refactor-navigation-commands.command';
 import { AddComposeEmailCommandMenuItemCommand } from 'src/database/commands/upgrade-version-command/1-21/1-21-workspace-command-1775500001000-add-compose-email-command-menu-item.command';
+import { AddGenerateProposalCommandMenuItemCommand } from 'src/database/commands/upgrade-version-command/1-21/1-21-workspace-command-1775500099000-add-generate-proposal-command-menu-item.command';
 import { AddGlobalKeyValuePairUniqueIndexCommand } from 'src/database/commands/upgrade-version-command/1-21/1-21-workspace-command-1775500002000-add-global-key-value-pair-unique-index.command';
 import { BackfillDatasourceToWorkspaceCommand } from 'src/database/commands/upgrade-version-command/1-21/1-21-workspace-command-1775500003000-backfill-datasource-to-workspace.command';
 import { BackfillMessageThreadSubjectCommand } from 'src/database/commands/upgrade-version-command/1-21/1-21-workspace-command-1775500004000-backfill-message-thread-subject.command';
@@ -51,6 +52,7 @@ import { WorkspaceMigrationModule } from 'src/engine/workspace-manager/workspace
   ],
   providers: [
     AddComposeEmailCommandMenuItemCommand,
+    AddGenerateProposalCommandMenuItemCommand,
     AddGlobalKeyValuePairUniqueIndexCommand,
     BackfillDatasourceToWorkspaceCommand,
     BackfillMessageThreadSubjectCommand,

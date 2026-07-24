@@ -51,6 +51,8 @@ export enum EngineComponentKey {
   REPLY_TO_EMAIL_THREAD = 'REPLY_TO_EMAIL_THREAD',
   COMPOSE_EMAIL = 'COMPOSE_EMAIL',
   COMPOSE_CAMPAIGN = 'COMPOSE_CAMPAIGN',
+  // Precatur — abre o gerador de proposta pré-preenchido a partir da Negociação.
+  GENERATE_PROPOSAL = 'GENERATE_PROPOSAL',
 
   // TODO: Remove deprecated keys once upgrade:1-21:refactor-navigation-commands has run on all workspaces
   // Deprecated: replaced by NAVIGATION engine key with payload

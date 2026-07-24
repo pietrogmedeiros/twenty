@@ -26,6 +26,10 @@ export enum AppPath {
   RecordShowPage = '/object/:objectNameSingular/:objectRecordId',
   PageLayoutPage = '/page/:pageLayoutId',
 
+  // Precatur — gerador de proposta (documento A4 paisagem, print-to-PDF).
+  // Renderizado fora do MainAppLayoutWithSidePanel para impressão limpa.
+  PrecaturProposta = '/precatur/proposta',
+
   Settings = `settings`,
   SettingsCatchAll = `/${Settings}/*`,
   Developers = `developers`,

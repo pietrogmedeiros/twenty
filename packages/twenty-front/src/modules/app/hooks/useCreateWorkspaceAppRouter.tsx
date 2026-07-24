@@ -123,6 +123,13 @@ const NotFound = lazy(() =>
   })),
 );
 
+// Precatur — página do gerador de proposta (preview ao vivo + Gerar PDF).
+const PropostaPage = lazy(() =>
+  import('~/pages/precatur/PropostaPage').then((module) => ({
+    default: module.PropostaPage,
+  })),
+);
+
 const preloadOnboardingPages = () => {
   void WorkspaceActivation.preload();
   void CreateProfile.preload();
@@ -152,6 +159,14 @@ const createWorkspaceAppRouter = (
               element={
                 <LazyRoute fallback={null}>
                   <WorkspaceSetup />
+                </LazyRoute>
+              }
+            />
+            <Route
+              path={AppPath.PrecaturProposta}
+              element={
+                <LazyRoute>
+                  <PropostaPage />
                 </LazyRoute>
               }
             />

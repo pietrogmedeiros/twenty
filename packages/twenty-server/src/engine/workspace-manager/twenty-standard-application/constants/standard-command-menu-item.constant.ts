@@ -1043,4 +1043,22 @@ export const STANDARD_COMMAND_MENU_ITEMS = {
     engineComponentKey: EngineComponentKey.COMPOSE_EMAIL,
     hotKeys: null,
   },
+  // Precatur — botão fixado "Gerar Proposta" na página de uma Negociação.
+  // Escopado pelo nameSingular do objeto (custom object criado por workspace),
+  // sem depender de universalIdentifier — mesmo padrão de exportNoteToPdf.
+  generateProposal: {
+    universalIdentifier: '795f11ce-313b-4abb-9c7e-192132bae1e7',
+    label: 'Gerar Proposta',
+    icon: 'IconFileText',
+    isPinned: true,
+    position: 67,
+    shortLabel: 'Proposta',
+    availabilityType: CommandMenuItemAvailabilityType.RECORD_SELECTION,
+    conditionalAvailabilityExpression:
+      'pageType == "RECORD_PAGE" and not isInSidePanel and numberOfSelectedRecords == 1 and objectMetadataItem.nameSingular == "negociacao"',
+    availabilityObjectMetadataUniversalIdentifier: null,
+    frontComponentUniversalIdentifier: null,
+    engineComponentKey: EngineComponentKey.GENERATE_PROPOSAL,
+    hotKeys: null,
+  },
 } as const;

@@ -1,0 +1,9 @@
+# Override para desenvolvimento local: expõe Postgres e Redis ao host
+# para que o twenty-server/twenty-front rodando via source (fora do Docker) os alcancem.
+services:
+  db:
+    ports:
+      - "5432:5432"
+  redis:
+    ports:
+      - "6379:6379"
