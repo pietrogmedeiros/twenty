@@ -1,6 +1,12 @@
 name: Precatur — build imagem HML
 
 on:
+  push:
+    branches:
+      - feat/precatur-gerador-proposta
+    paths:
+      - '.github/workflows/precatur-build-hml.yaml'
+      - 'packages/**'
   workflow_dispatch:
     inputs:
       tag:
