@@ -1,9 +1,10 @@
 # Override para desenvolvimento local: expõe Postgres e Redis ao host
 # para que o twenty-server/twenty-front rodando via source (fora do Docker) os alcancem.
+# Postgres no host 5433 porque 5432 já é usado por outro projeto Docker (webshield).
 services:
   db:
     ports:
-      - "5432:5432"
+      - "5433:5432"
   redis:
     ports:
       - "6379:6379"

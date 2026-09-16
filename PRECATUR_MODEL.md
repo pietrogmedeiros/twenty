@@ -41,6 +41,20 @@ Precatório(rel), Tipo(Pagamento ao cedente/Recebimento do ente), Status(Previst
 - Processo Administrativo: Nº do ofício requisitório (texto), Situação na fila cronológica (texto/número), Exercício de pagamento (número — ano de quitação).
 - Pagamento (Financeiro): Valor de aquisição (moeda), Deságio efetivo % (número), Dados bancários do cedente (texto: banco/agência/conta ou PIX).
 
+## Campos dos pipelines — lista do cliente (criados em 15/09/2026, 59 campos)
+Criados via `precatur-build/criar-campos-pipelines.mjs`. Anexos/documentos são **TEXT** (o arquivo físico vai na aba Attachments do registro) — FIELD tipo FILES não é criável via API em custom object. Registro da execução: `precatur-build/SESSAO-2026-09-15.md`.
+
+- **Negociação (22)**: resposta, aceite(bool), cessionario, certidaoCasamentoNascimento*, comprovanteResidencia*, confirmacaoDiretorComercial(bool), consideracoes(rich), contraProposta($), dadosBancarios, enteDevedor, identidadeCnh*, informativoCessao*, nomeCedente, numeroPrecatorio, numeroProcesso, percentualDesembolso(float 2), propostaInicial($), telefone, valorOficio($), valorCedente($), valorComissao($), valorDesembolso($).
+- **Análise Jurídica (26)**: anexoCalculoAtualizado*, anexoCalculosHomologados*, anexoCalculosPreAnalise*, anexoOficio*, anexoPrecatorio*, anexoProcesso*, anexoSentencaAcordao*, anoOrcamentario(int), calculoAtualizadoValor($), certidoesNegativas{Estaduais, JusticaEstadual1Grau, JusticaEstadual2Grau, JusticaFederalUnificada, Municipais, Trabalhistas, Uniao}*, contratoHonorarios*, decisaoHomologatoria*, honorariosContratuaisPercentual(float 2), natureza(SELECT Alimentar/Comum), numeroOficio, observacoesPreAnalise(rich), pendenciasProvidenciar(rich), previsaoPagamentoAno(int), protocolo, regime.
+- **Processo Administrativo (9)**: minutaContratoParticular*, minutaEscrituraPublica*, peticaoHomologacao*, paperPagamento*, aprovacaoComercial(bool), aprovacaoJuridica(bool), aprovacaoAdministrativa(bool), autorizacaoResponsavelAdmFinanceiro, autorizacaoResponsavelJuridico.
+- **Pagamento (2)**: contratoParticularAssinado*, trasladoEscritura*.
+
+`*` = campo de anexo (TEXT + descrição apontando para a aba Attachments).
+
+**Não criados por já existirem (confirmado pelo dono em 15/09)**: "Origem do Lead"→`canalOrigem` e "CNPJ/CPF"/"CPF"→`cpfCnpjCedente` (Negociação); "Parecer Jurídico"→`parecerJuridico` (Análise); "Comprovante de Pagamento"→`comprovante` (Pagamento).
+
+**Interpretações confirmadas pelo dono em 15/09**: `resposta` = campo literal "3. Resposta" do formulário; "Aprovações (Comercial, Jurídico, Administrativo)" = 3 BOOLEANs no Processo Administrativo; as 2 "Autorização - Responsável…" ficam TEXT (podem virar relação→membro depois); "Contrato Honorários" = anexo.
+
 ## PERMISSÕES — decisão do dono: TRAVAR POR SETOR desde o início (dono: Alicerce)
 Criar 4 roles no Twenty: Comercial, Jurídico, Administrativo, Financeiro.
 - Cada role EDITA apenas o seu objeto; LÊ o Precatório central; LÊ (read-only) os demais objetos-setor.
