@@ -285,26 +285,37 @@ for (const objectName of TARGET_OBJECTS) {
       continue;
     }
 
-    // Logo depois da primeira aba (normalmente "Home"), como no Bitrix
-    const positions = pageLayout.tabs
-      .map((tab) => tab.position)
-      .sort((a, b) => a - b);
-    const position =
-      positions.length > 1 ? (positions[0] + positions[1]) / 2 : (positions[0] ?? 0) + 1;
-
-    const { createPageLayoutTab } = await gql(
-      `mutation($input: CreatePageLayoutTabInput!) {
-        createPageLayoutTab(input: $input) { id }
-      }`,
-      {
-        input: {
-          title: CHAT_TAB_TITLE,
-          pageLayoutId: pageLayout.id,
-          position,
-          layoutMode: 'VERTICAL_LIST',
-        },
-      },
+    // Reaproveita uma aba "Chat" vazia (ex.: sobra de uma rodada em que o
+    // widget falhou) em vez de criar outra
+    const emptyChatTab = pageLayout.tabs.find(
+      (tab) => tab.title === CHAT_TAB_TITLE && tab.widgets.length === 0,
     );
+
+    let chatTabId = emptyChatTab?.id;
+
+    if (!chatTabId) {
+      // Logo depois da primeira aba (normalmente "Home"), como no Bitrix
+      const positions = pageLayout.tabs
+        .map((tab) => tab.position)
+        .sort((a, b) => a - b);
+      const position =
+        positions.length > 1 ? (positions[0] + positions[1]) / 2 : (positions[0] ?? 0) + 1;
+
+      const { createPageLayoutTab } = await gql(
+        `mutation($input: CreatePageLayoutTabInput!) {
+          createPageLayoutTab(input: $input) { id }
+        }`,
+        {
+          input: {
+            title: CHAT_TAB_TITLE,
+            pageLayoutId: pageLayout.id,
+            position,
+            layoutMode: 'VERTICAL_LIST',
+          },
+        },
+      );
+      chatTabId = createPageLayoutTab.id;
+    }
 
     await gql(
       `mutation($input: CreatePageLayoutWidgetInput!) {
@@ -312,7 +323,7 @@ for (const objectName of TARGET_OBJECTS) {
       }`,
       {
         input: {
-          pageLayoutTabId: createPageLayoutTab.id,
+          pageLayoutTabId: chatTabId,
           title: CHAT_TAB_TITLE,
           type: 'CHAT',
           gridPosition: { row: 0, column: 0, rowSpan: 12, columnSpan: 12 },
