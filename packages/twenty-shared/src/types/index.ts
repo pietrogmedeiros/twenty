@@ -206,6 +206,7 @@ export type {
   EmailsConfiguration,
   EmailThreadConfiguration,
   CalendarConfiguration,
+  ChatConfiguration,
   WorkflowConfiguration,
   WorkflowVersionConfiguration,
   WorkflowRunConfiguration,

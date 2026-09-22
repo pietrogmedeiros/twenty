@@ -30,6 +30,9 @@ export enum AppPath {
   // Renderizado fora do MainAppLayoutWithSidePanel para impressão limpa.
   PrecaturProposta = '/precatur/proposta',
 
+  // Precatur — caixa de entrada do chat interno por registro (estilo Bitrix)
+  PrecaturChats = '/chats',
+
   Settings = `settings`,
   SettingsCatchAll = `/${Settings}/*`,
   Developers = `developers`,

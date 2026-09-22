@@ -130,6 +130,13 @@ const PropostaPage = lazy(() =>
   })),
 );
 
+// Precatur — caixa de entrada do chat interno por registro.
+const PrecaturChatInboxPage = lazy(() =>
+  import('~/pages/precatur/PrecaturChatInboxPage').then((module) => ({
+    default: module.PrecaturChatInboxPage,
+  })),
+);
+
 const preloadOnboardingPages = () => {
   void WorkspaceActivation.preload();
   void CreateProfile.preload();
@@ -171,6 +178,14 @@ const createWorkspaceAppRouter = (
               }
             />
             <Route element={<MainAppLayoutWithSidePanel />}>
+              <Route
+                path={AppPath.PrecaturChats}
+                element={
+                  <LazyRoute>
+                    <PrecaturChatInboxPage />
+                  </LazyRoute>
+                }
+              />
               <Route
                 path={indexAppPath.getIndexAppPath()}
                 element={<RecordIndexSkeletonLoader />}

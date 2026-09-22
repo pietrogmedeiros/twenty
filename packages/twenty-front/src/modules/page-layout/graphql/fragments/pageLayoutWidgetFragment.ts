@@ -174,6 +174,9 @@ export const PAGE_LAYOUT_WIDGET_FRAGMENT = gql`
       ... on NotesConfiguration {
         configurationType
       }
+      ... on ChatConfiguration {
+        configurationType
+      }
       ... on TasksConfiguration {
         configurationType
       }

@@ -42,6 +42,7 @@ export const getWidgetTitle = (
     case WidgetConfigurationType.VIEW:
     case WidgetConfigurationType.TIMELINE:
     case WidgetConfigurationType.FIELD_RICH_TEXT:
+    case WidgetConfigurationType.CHAT:
     default:
       assertUnreachable(configuration.configurationType as never);
   }

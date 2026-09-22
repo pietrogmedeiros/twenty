@@ -125,6 +125,7 @@ import { AddOnConnectLogicFunctionToConnectionProviderFastInstanceCommand } from
 import { RepairKeyValuePairApplicationIdFastInstanceCommand } from './2-24/2-24-instance-command-fast-1784897347051-repair-key-value-pair-application-id';
 import { AddAgentForeignKeyToRoleTargetFastInstanceCommand } from './2-25/2-25-instance-command-fast-1784820332810-add-agent-foreign-key-to-role-target';
 import { AddPageLayoutCascadeDeleteIndexesFastInstanceCommand } from './2-25/2-25-instance-command-fast-1784904030251-add-page-layout-cascade-delete-indexes';
+import { AddChatWidgetTypeFastInstanceCommand } from 'src/database/commands/upgrade-version-command/2-25/2-25-instance-command-fast-1790108283971-add-chat-widget-type';
 
 export const INSTANCE_COMMANDS = [
   AddViewFieldGroupIdIndexOnViewFieldFastInstanceCommand,
@@ -252,4 +253,5 @@ export const INSTANCE_COMMANDS = [
   RepairKeyValuePairApplicationIdFastInstanceCommand,
   AddAgentForeignKeyToRoleTargetFastInstanceCommand,
   AddPageLayoutCascadeDeleteIndexesFastInstanceCommand,
+  AddChatWidgetTypeFastInstanceCommand,
 ];

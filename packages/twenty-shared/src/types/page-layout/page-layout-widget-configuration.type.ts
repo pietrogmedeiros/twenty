@@ -157,6 +157,10 @@ export type CalendarConfiguration = {
   configurationType: 'CALENDAR';
 };
 
+export type ChatConfiguration = {
+  configurationType: 'CHAT';
+};
+
 export type WorkflowConfiguration = {
   configurationType: 'WORKFLOW';
 };
@@ -191,4 +195,5 @@ export type PageLayoutWidgetConfiguration =
   | WorkflowConfiguration
   | WorkflowVersionConfiguration
   | WorkflowRunConfiguration
-  | EmailThreadConfiguration;
+  | EmailThreadConfiguration
+  | ChatConfiguration;

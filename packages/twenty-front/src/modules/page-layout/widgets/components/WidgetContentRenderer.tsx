@@ -10,6 +10,7 @@ import { FrontComponentWidgetRenderer } from '@/page-layout/widgets/front-compon
 import { GraphWidgetRenderer } from '@/page-layout/widgets/graph/components/GraphWidgetRenderer';
 import { IframeWidget } from '@/page-layout/widgets/iframe/components/IframeWidget';
 import { NoteWidget } from '@/page-layout/widgets/notes/components/NoteWidget';
+import { PrecaturChatWidget } from '@/page-layout/widgets/precatur-chat/components/PrecaturChatWidget';
 import { StandaloneRichTextWidgetRenderer } from '@/page-layout/widgets/standalone-rich-text/components/StandaloneRichTextWidgetRenderer';
 import { TaskWidget } from '@/page-layout/widgets/tasks/components/TaskWidget';
 import { TimelineWidget } from '@/page-layout/widgets/timeline/components/TimelineWidget';
@@ -80,6 +81,9 @@ export const WidgetContentRenderer = ({
 
     case WidgetType.EMAIL_THREAD:
       return <EmailThreadWidget widget={widget} />;
+
+    case WidgetType.CHAT:
+      return <PrecaturChatWidget widget={widget} />;
 
     default:
       return null;

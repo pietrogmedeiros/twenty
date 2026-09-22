@@ -12,6 +12,7 @@ import { createDefaultFieldWidget } from '@/page-layout/utils/createDefaultField
 import { createDefaultFieldsWidget } from '@/page-layout/utils/createDefaultFieldsWidget';
 import { isVerticalListPosition } from '@/page-layout/utils/isVerticalListPosition';
 import { removeWidgetFromTab } from '@/page-layout/utils/removeWidgetFromTab';
+import { useIsPrecaturChatEnabled } from '@/precatur-chat/hooks/useIsPrecaturChatEnabled';
 import { useFieldWidgetEligibleFields } from '@/page-layout/widgets/field/hooks/useFieldWidgetEligibleFields';
 import { getFieldWidgetDefaultDisplayMode } from '@/page-layout/widgets/field/utils/getFieldWidgetDisplayModeConfig';
 import { SidePanelGroup } from '@/side-panel/components/SidePanelGroup';
@@ -31,7 +32,7 @@ import { useStore } from 'jotai';
 import { useCallback } from 'react';
 import { SidePanelPages } from 'twenty-shared/types';
 import { isDefined } from 'twenty-shared/utils';
-import { IconApps, IconList } from 'twenty-ui/icon';
+import { IconApps, IconList, IconMessageCircle } from 'twenty-ui/icon';
 import { v4 as uuidv4 } from 'uuid';
 import {
   type FrontComponent,
@@ -328,9 +329,73 @@ export const SidePanelPageLayoutRecordPageWidgetTypeSelect = () => {
     ],
   );
 
+  const isPrecaturChatEnabled = useIsPrecaturChatEnabled();
+
+  // Precatur: chat interno por registro, ocupa a aba inteira quando está sozinho
+  const handleCreatePrecaturChatWidget = useCallback(() => {
+    const replacePositionIndex = getExistingWidgetPositionIndex();
+    removeExistingWidgetIfReplacing();
+
+    const updatedPageLayout = store.get(pageLayoutDraftState);
+    const activeTab = updatedPageLayout.tabs.find((tab) => tab.id === tabId);
+    const positionIndex =
+      replacePositionIndex ?? activeTab?.widgets.length ?? 0;
+    const widgetId = uuidv4();
+
+    const newWidget: PageLayoutWidget = {
+      __typename: 'PageLayoutWidget',
+      id: widgetId,
+      applicationId: '',
+      isActive: true,
+      pageLayoutTabId: tabId,
+      title: 'Chat',
+      type: WidgetType.CHAT,
+      configuration: {
+        __typename: 'ChatConfiguration',
+        configurationType: WidgetConfigurationType.CHAT,
+      },
+      gridPosition: {
+        __typename: 'GridPosition',
+        row: 0,
+        column: 0,
+        rowSpan: 12,
+        columnSpan: 12,
+      },
+      position: {
+        __typename: 'PageLayoutWidgetVerticalListPosition',
+        layoutMode: PageLayoutTabLayoutMode.VERTICAL_LIST,
+        index: positionIndex,
+      },
+      objectMetadataId: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      deletedAt: null,
+    };
+
+    store.set(pageLayoutDraftState, (prev) => ({
+      ...prev,
+      tabs: addWidgetToTab(prev.tabs, tabId, newWidget),
+    }));
+
+    setPageLayoutEditingWidgetId(widgetId);
+    insertCreatedWidgetAtContext(widgetId);
+
+    closeSidePanelMenu();
+  }, [
+    closeSidePanelMenu,
+    getExistingWidgetPositionIndex,
+    insertCreatedWidgetAtContext,
+    pageLayoutDraftState,
+    removeExistingWidgetIfReplacing,
+    setPageLayoutEditingWidgetId,
+    store,
+    tabId,
+  ]);
+
   const selectableItemIds = [
     'fields',
     'field',
+    ...(isPrecaturChatEnabled ? ['precatur-chat'] : []),
     ...frontComponentsWithSelectItemId.map(({ selectItemId }) => selectItemId),
   ];
 
@@ -353,6 +418,19 @@ export const SidePanelPageLayoutRecordPageWidgetTypeSelect = () => {
             onClick={handleCreateFieldWidget}
           />
         </SelectableListItem>
+        {isPrecaturChatEnabled && (
+          <SelectableListItem
+            itemId="precatur-chat"
+            onEnter={handleCreatePrecaturChatWidget}
+          >
+            <CommandMenuItem
+              Icon={IconMessageCircle}
+              label="Bate-papo (chat)"
+              id="precatur-chat"
+              onClick={handleCreatePrecaturChatWidget}
+            />
+          </SelectableListItem>
+        )}
       </SidePanelGroup>
 
       {frontComponentsWithSelectItemId.length > 0 && (
