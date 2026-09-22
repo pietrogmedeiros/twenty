@@ -1,4 +1,6 @@
 export enum SettingsPath {
+  // Precatur — campos obrigatórios por etapa de pipeline
+  PrecaturStageRules = 'regras-etapa',
   ProfilePage = 'profile',
   TwoFactorAuthenticationStrategyConfig = 'profile/two-factor-authentication/:twoFactorAuthenticationStrategy',
   Experience = 'experience',

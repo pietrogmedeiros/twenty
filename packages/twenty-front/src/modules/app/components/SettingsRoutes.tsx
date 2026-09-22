@@ -442,6 +442,15 @@ const SettingsUsageUserDetail = lazy(() =>
   })),
 );
 
+// Precatur — campos obrigatórios por etapa de pipeline
+const SettingsPrecaturStageRules = lazy(() =>
+  import('~/pages/settings/precatur/SettingsPrecaturStageRules').then(
+    (module) => ({
+      default: module.SettingsPrecaturStageRules,
+    }),
+  ),
+);
+
 const SettingsObjects = lazy(() =>
   import('~/pages/settings/data-model/SettingsObjects').then((module) => ({
     default: module.SettingsObjects,
@@ -827,6 +836,10 @@ export const SettingsRoutes = ({ isAdminPageEnabled }: SettingsRoutesProps) => (
         }
       >
         <Route path={SettingsPath.Objects} element={<SettingsObjects />} />
+        <Route
+          path={SettingsPath.PrecaturStageRules}
+          element={<SettingsPrecaturStageRules />}
+        />
         <Route
           path={SettingsPath.ObjectOverview}
           element={<SettingsObjectOverview />}

@@ -9,6 +9,7 @@ import { recordIndexRecordIdsByGroupComponentFamilyState } from '@/object-record
 import { useUpsertRecordsInStore } from '@/object-record/record-store/hooks/useUpsertRecordsInStore';
 import { recordStoreFamilyState } from '@/object-record/record-store/states/recordStoreFamilyState';
 import { type ObjectRecord } from '@/object-record/types/ObjectRecord';
+import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { useAtomComponentFamilyStateCallbackState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentFamilyStateCallbackState';
 import { useAtomComponentSelectorValue } from '@/ui/utilities/state/jotai/hooks/useAtomComponentSelectorValue';
 import { useCallback, useContext } from 'react';
@@ -30,6 +31,7 @@ export const useUpdateDroppedRecordOnBoard = () => {
   );
 
   const { upsertRecordsInStore } = useUpsertRecordsInStore();
+  const { enqueueErrorSnackBar } = useSnackBar();
 
   const updateDroppedRecordOnBoard = useCallback(
     (
@@ -109,6 +111,13 @@ export const useUpdateDroppedRecordOnBoard = () => {
         recordIndexRecordIdsByGroupCallbackFamilyState(targetRecordGroupId),
       ) as string[];
 
+      // Precatur: o servidor pode recusar a mudança (ex.: campos obrigatórios da
+      // etapa). Guardamos as colunas para devolver o card se isso acontecer.
+      const initialRecordGroupIdsBeforeDrop =
+        currentRecordIdsInInitialRecordGroup;
+      const targetRecordGroupIdsBeforeDrop =
+        currentRecordIdsInTargetRecordGroup;
+
       if (indexOfDroppedRecordInInitialRecordGroup === -1) {
         throw new Error(
           `Cannot find record id in initial record group ids on drop, this should not happen, recordId: ${recordId}, initialRecordGroupId: ${initialRecordGroupId}`,
@@ -171,15 +180,38 @@ export const useUpdateDroppedRecordOnBoard = () => {
         ],
       });
 
-      updateOneRecord({
-        idToUpdate: recordId,
-        updateOneRecordInput: {
-          [recordGroupColumnName]: targetRecordGroupValue,
-          ...(isDefined(newPosition) && { position: newPosition }),
-        },
-      });
+      const restoreBoardBeforeDrop = (error: Error) => {
+        store.set(
+          recordIndexRecordIdsByGroupCallbackFamilyState(initialRecordGroupId),
+          initialRecordGroupIdsBeforeDrop,
+        );
+
+        if (!movingInsideSameRecordGroup) {
+          store.set(
+            recordIndexRecordIdsByGroupCallbackFamilyState(targetRecordGroupId),
+            targetRecordGroupIdsBeforeDrop,
+          );
+        }
+
+        upsertRecordsInStore({
+          partialRecords: [initialRecord as ObjectRecord],
+        });
+
+        enqueueErrorSnackBar({ apolloError: error });
+      };
+
+      Promise.resolve(
+        updateOneRecord({
+          idToUpdate: recordId,
+          updateOneRecordInput: {
+            [recordGroupColumnName]: targetRecordGroupValue,
+            ...(isDefined(newPosition) && { position: newPosition }),
+          },
+        }),
+      ).catch(restoreBoardBeforeDrop);
     },
     [
+      enqueueErrorSnackBar,
       recordGroupDefinitions,
       recordIndexRecordIdsByGroupCallbackFamilyState,
       selectFieldMetadataItem,

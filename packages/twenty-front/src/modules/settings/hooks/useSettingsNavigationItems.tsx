@@ -5,6 +5,7 @@ import { currentUserState } from '@/auth/states/currentUserState';
 import { currentWorkspaceMemberState } from '@/auth/states/currentWorkspaceMemberState';
 import { billingState } from '@/client-config/states/billingState';
 import { supportChatState } from '@/client-config/states/supportChatState';
+import { useIsPrecaturStageRulesEnabled } from '@/precatur-stage-rules/hooks/useIsPrecaturStageRulesEnabled';
 import { usePermissionFlagMap } from '@/settings/roles/hooks/usePermissionFlagMap';
 import { getDocumentationUrl } from '@/support/utils/getDocumentationUrl';
 import {
@@ -25,6 +26,7 @@ import {
   IconDoorEnter,
   IconHelpCircle,
   IconHierarchy2,
+  IconListCheck,
   IconLayout,
   IconMail,
   IconMessage,
@@ -73,6 +75,7 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
     isNonEmptyString(supportChat.supportFrontChatId);
 
   const permissionMap = usePermissionFlagMap();
+  const isPrecaturStageRulesEnabled = useIsPrecaturStageRulesEnabled();
   const isEmailGroupFeatureEnabled = useIsFeatureEnabled(
     FeatureFlagKey.IS_EMAIL_GROUP_ENABLED,
   );
@@ -128,6 +131,14 @@ const useSettingsNavigationItems = (): SettingsNavigationSection[] => {
           path: SettingsPath.Objects,
           Icon: IconHierarchy2,
           isHidden: !permissionMap[PermissionFlagType.DATA_MODEL],
+        },
+        {
+          label: 'Regras de etapa',
+          path: SettingsPath.PrecaturStageRules,
+          Icon: IconListCheck,
+          isHidden:
+            !isPrecaturStageRulesEnabled ||
+            !permissionMap[PermissionFlagType.DATA_MODEL],
         },
         {
           label: t`Layout`,
