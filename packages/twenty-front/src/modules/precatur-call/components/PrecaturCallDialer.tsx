@@ -11,6 +11,7 @@ import { type PrecaturCallResult } from '@/precatur-call/types/PrecaturCallResul
 import { type PrecaturCallStatus } from '@/precatur-call/types/PrecaturCallStatus';
 import { type PrecaturCallTarget } from '@/precatur-call/types/PrecaturCallTarget';
 import { formatPrecaturCallDuration } from '@/precatur-call/utils/formatPrecaturCallDuration';
+import { getPrecaturCallPhoneNumber } from '@/precatur-call/utils/getPrecaturCallPhoneNumber';
 import { SettingsTextInput } from '@/ui/input/components/SettingsTextInput';
 import { useSnackBar } from '@/ui/feedback/snack-bar-manager/hooks/useSnackBar';
 import { styled } from '@linaria/react';
@@ -29,6 +30,7 @@ import { Button, LightIconButton } from 'twenty-ui/input';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
 const PHONE_FIELD_NAME = 'telefone';
+const CEDENTE_FIELD_NAME = 'cedente';
 
 const StyledContainer = styled.div`
   align-items: center;
@@ -140,9 +142,10 @@ export const PrecaturCallDialer = ({
   const { objectMetadataItem } = useObjectMetadataItem({
     objectNameSingular: target.objectNameSingular,
   });
-  const hasPhoneField = objectMetadataItem.fields.some(
-    (field) => field.name === PHONE_FIELD_NAME && field.isActive,
-  );
+  const hasActiveField = (fieldName: string) =>
+    objectMetadataItem.fields.some(
+      (field) => field.name === fieldName && field.isActive,
+    );
 
   const { record, loading } = useFindOneRecord({
     objectNameSingular: target.objectNameSingular,
@@ -150,14 +153,18 @@ export const PrecaturCallDialer = ({
     recordGqlFields: {
       id: true,
       name: true,
-      ...(hasPhoneField ? { [PHONE_FIELD_NAME]: true } : {}),
+      ...(hasActiveField(PHONE_FIELD_NAME) ? { [PHONE_FIELD_NAME]: true } : {}),
+      ...(hasActiveField(CEDENTE_FIELD_NAME)
+        ? { [CEDENTE_FIELD_NAME]: { id: true, phones: true } }
+        : {}),
     },
   });
 
   const recordName: string = record?.name ?? 'Contato';
-  const recordPhone: string = hasPhoneField
-    ? (record?.[PHONE_FIELD_NAME] ?? '')
-    : '';
+  const recordPhone = getPrecaturCallPhoneNumber({
+    telefone: record?.[PHONE_FIELD_NAME],
+    cedente: record?.[CEDENTE_FIELD_NAME],
+  });
 
   const [phoneNumber, setPhoneNumber] = useState('');
   const [status, setStatus] = useState<PrecaturCallStatus>('IDLE');
@@ -210,8 +217,8 @@ export const PrecaturCallDialer = ({
     }
     setHasAutoDialed(true);
 
-    if (isNonEmptyString(recordPhone.trim())) {
-      startCall(recordPhone.trim());
+    if (isNonEmptyString(recordPhone)) {
+      startCall(recordPhone);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, recordPhone, hasAutoDialed]);
@@ -301,7 +308,11 @@ export const PrecaturCallDialer = ({
           <StyledPhone>{phoneNumber}</StyledPhone>
         )}
         <StyledStatus isInCall={isInCall}>
-          {loading ? 'Carregando…' : statusLabel}
+          {loading
+            ? 'Carregando…'
+            : status === 'IDLE'
+              ? 'Negócio sem telefone cadastrado'
+              : statusLabel}
         </StyledStatus>
       </StyledIdentity>
 
