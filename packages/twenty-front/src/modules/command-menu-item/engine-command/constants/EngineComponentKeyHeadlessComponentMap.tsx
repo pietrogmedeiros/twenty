@@ -19,6 +19,7 @@ import { SeeDeletedRecordsNoSelectionRecordCommand } from '@/command-menu-item/e
 import { AddToFavoritesSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/components/AddToFavoritesSingleRecordCommand';
 import { ExportNoteSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/components/ExportNoteSingleRecordCommand';
 import { GenerateProposalSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/components/GenerateProposalSingleRecordCommand';
+import { PrecaturCallSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/components/PrecaturCallSingleRecordCommand';
 import { NavigateToNextRecordSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/components/NavigateToNextRecordSingleRecordCommand';
 import { NavigateToPreviousRecordSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/components/NavigateToPreviousRecordSingleRecordCommand';
 import { RemoveFromFavoritesSingleRecordCommand } from '@/command-menu-item/engine-command/record/single-record/components/RemoveFromFavoritesSingleRecordCommand';
@@ -106,6 +107,7 @@ export const ENGINE_COMPONENT_KEY_COMPONENT_MAP: Record<
   [EngineComponentKey.GENERATE_PROPOSAL]: (
     <GenerateProposalSingleRecordCommand />
   ),
+  [EngineComponentKey.PRECATUR_CALL]: <PrecaturCallSingleRecordCommand />,
   [EngineComponentKey.EXPORT_RECORDS]: <ExportRecordsCommand />,
   [EngineComponentKey.UPDATE_MULTIPLE_RECORDS]: (
     <UpdateMultipleRecordsCommand />

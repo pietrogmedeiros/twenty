@@ -16,6 +16,8 @@ import { useAtomComponentFamilyState } from '@/ui/utilities/state/jotai/hooks/us
 import { useAtomComponentState } from '@/ui/utilities/state/jotai/hooks/useAtomComponentState';
 import { useAtomFamilyStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomFamilyStateValue';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { PrecaturCallCardButton } from '@/precatur-call/components/PrecaturCallCardButton';
+import { isPrecaturCallObject } from '@/precatur-call/utils/isPrecaturCallObject';
 import { useGetCurrentViewOnly } from '@/views/hooks/useGetCurrentViewOnly';
 import { ViewOpenRecordIn } from '~/generated-metadata/graphql';
 import { styled } from '@linaria/react';
@@ -35,6 +37,11 @@ const StyledCompactIconContainer = styled.div`
 
 const StyledCheckboxContainer = styled.div`
   margin-left: auto;
+`;
+
+// Precatur — botão Ligar sempre visível no card dos funis (não só no hover)
+const StyledCallButtonContainer = styled.div`
+  margin-left: ${themeCssVariables.spacing[1]};
 `;
 
 const StyledRecordChipContainer = styled.div`
@@ -112,6 +119,16 @@ export const RecordBoardCardHeader = () => {
             />
           </StopPropagationContainer>
         </StyledCompactIconContainer>
+      )}
+      {isPrecaturCallObject(objectMetadataItem.nameSingular) && (
+        <StyledCallButtonContainer>
+          <StopPropagationContainer>
+            <PrecaturCallCardButton
+              recordId={recordId}
+              objectNameSingular={objectMetadataItem.nameSingular}
+            />
+          </StopPropagationContainer>
+        </StyledCallButtonContainer>
       )}
       <StyledCheckboxContainer className="checkbox-container">
         <StopPropagationContainer>
