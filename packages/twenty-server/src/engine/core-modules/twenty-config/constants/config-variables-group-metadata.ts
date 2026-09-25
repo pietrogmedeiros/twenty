@@ -140,4 +140,11 @@ export const CONFIG_VARIABLES_GROUP_METADATA: Record<
     isHiddenOnLoad: true,
     isHiddenInAdminPanel: true,
   },
+  [ConfigVariablesGroup.PRECATUR_CHATWOOT]: {
+    position: 2200,
+    description:
+      'Precatur: Chatwoot (WhatsApp API oficial) usado pelo follow-up automático dos negócios',
+    isHiddenOnLoad: true,
+    isHiddenInAdminPanel: false,
+  },
 };

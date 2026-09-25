@@ -15,6 +15,7 @@ import { CronTriggerCronCommand } from 'src/engine/core-modules/logic-function/l
 import { CheckPublicDomainsValidRecordsCronCommand } from 'src/engine/core-modules/public-domain/crons/commands/check-public-domains-valid-records.cron.command';
 import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { CheckCustomDomainValidRecordsCronCommand } from 'src/engine/core-modules/workspace/crons/commands/check-custom-domain-valid-records.cron.command';
+import { PrecaturFollowUpCronCommand } from 'src/modules/precatur-follow-up/crons/commands/precatur-follow-up.cron.command';
 import { WebhookSubscriptionRenewalCronCommand } from 'src/modules/connected-account/webhook-subscription-manager/crons/commands/webhook-subscription-renewal.cron.command';
 import { TrashCleanupCronCommand } from 'src/engine/trash-cleanup/commands/trash-cleanup.cron.command';
 import { CleanOnboardingWorkspacesCronCommand } from 'src/engine/workspace-manager/workspace-cleaner/commands/clean-onboarding-workspaces.cron.command';
@@ -60,6 +61,7 @@ export class CronRegisterAllCommand extends CommandRunner {
     private readonly workflowCoreConsistencyCronCommand: WorkflowCoreConsistencyCronCommand,
 
     private readonly checkCustomDomainValidRecordsCronCommand: CheckCustomDomainValidRecordsCronCommand,
+    private readonly precaturFollowUpCronCommand: PrecaturFollowUpCronCommand,
     private readonly checkPublicDomainsValidRecordsCronCommand: CheckPublicDomainsValidRecordsCronCommand,
     private readonly cronTriggerCronCommand: CronTriggerCronCommand,
     private readonly cleanSuspendedWorkspacesCronCommand: CleanSuspendedWorkspacesCronCommand,
@@ -131,6 +133,10 @@ export class CronRegisterAllCommand extends CommandRunner {
       {
         name: 'CheckCustomDomainValidRecords',
         command: this.checkCustomDomainValidRecordsCronCommand,
+      },
+      {
+        name: 'PrecaturFollowUp',
+        command: this.precaturFollowUpCronCommand,
       },
       {
         name: 'CheckPublicDomainsValidRecords',

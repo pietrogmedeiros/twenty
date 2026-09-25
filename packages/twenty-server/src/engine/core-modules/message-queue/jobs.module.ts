@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TypeORMModule } from 'src/database/typeorm/typeorm.module';
 import { PrecaturChatModule } from 'src/modules/precatur-chat/precatur-chat.module';
+import { PrecaturFollowUpModule } from 'src/modules/precatur-follow-up/precatur-follow-up.module';
 import { AuthModule } from 'src/engine/core-modules/auth/auth.module';
 import { BillingModule } from 'src/engine/core-modules/billing/billing.module';
 import { BillingProductEntity } from 'src/engine/core-modules/billing/entities/billing-product.entity';
@@ -99,6 +100,7 @@ import { WorkflowModule } from 'src/modules/workflow/workflow.module';
     OnboardingModule,
     BillingReminderModule,
     PrecaturChatModule,
+    PrecaturFollowUpModule,
   ],
   providers: [
     BillingReminderCronJob,

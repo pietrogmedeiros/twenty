@@ -1999,6 +1999,68 @@ export class ConfigVariables {
   @IsOptional()
   AWS_SES_SESSION_TOKEN: string;
 
+  // Precatur — follow-up automático por WhatsApp via Chatwoot. Sem URL, token
+  // e os 3 templates, o follow-up roda em modo simulação (não envia nada).
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.PRECATUR_CHATWOOT,
+    description: 'Chatwoot base URL, e.g. https://chat.example.com',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  PRECATUR_CHATWOOT_URL: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.PRECATUR_CHATWOOT,
+    description: 'Chatwoot account ID',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  PRECATUR_CHATWOOT_ACCOUNT_ID: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.PRECATUR_CHATWOOT,
+    description: 'Chatwoot WhatsApp (Cloud API) inbox ID',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  PRECATUR_CHATWOOT_INBOX_ID: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.PRECATUR_CHATWOOT,
+    isSensitive: true,
+    description: 'Chatwoot user API access token',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  PRECATUR_CHATWOOT_API_TOKEN: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.PRECATUR_CHATWOOT,
+    isSensitive: true,
+    description:
+      'Secret expected in the ?token= query of the Chatwoot webhook URL',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  PRECATUR_CHATWOOT_WEBHOOK_TOKEN: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.PRECATUR_CHATWOOT,
+    description:
+      'Approved WhatsApp template names for follow-ups 1, 2 and 3, comma separated',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  PRECATUR_FOLLOW_UP_TEMPLATES: string;
+
+  @ConfigVariablesMetadata({
+    group: ConfigVariablesGroup.PRECATUR_CHATWOOT,
+    description: 'Language code of the follow-up templates',
+    type: ConfigVariableType.STRING,
+  })
+  @IsOptional()
+  PRECATUR_FOLLOW_UP_TEMPLATE_LANGUAGE = 'pt_BR';
+
   @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.AWS_SES_SETTINGS,
     isSensitive: true,

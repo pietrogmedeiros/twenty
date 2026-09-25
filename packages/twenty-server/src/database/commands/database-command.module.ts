@@ -35,6 +35,7 @@ import { UpgradeStatusCommand } from 'src/engine/core-modules/upgrade/commands/u
 import { UpgradeModule } from 'src/engine/core-modules/upgrade/upgrade.module';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { WorkspaceModule } from 'src/engine/core-modules/workspace/workspace.module';
+import { PrecaturFollowUpModule } from 'src/modules/precatur-follow-up/precatur-follow-up.module';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { ObjectMetadataModule } from 'src/engine/metadata-modules/object-metadata/object-metadata.module';
 import { RoleEntity } from 'src/engine/metadata-modules/role/role.entity';
@@ -68,6 +69,7 @@ import { WorkflowCoreConsistencyModule } from 'src/modules/workflow/workflow-cor
     WorkflowCoreConsistencyModule,
     FileModule,
     WorkspaceModule,
+    PrecaturFollowUpModule,
     WorkflowRunQueueModule,
     // Data seeding dependencies
     TypeORMModule,
