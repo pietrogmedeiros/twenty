@@ -166,6 +166,10 @@ try {
     getRoles {
       id label canUpdateAllObjectRecords canReadAllObjectRecords canUpdateAllSettings
       permissionFlags { flag }
+      objectPermissions {
+        objectMetadataId canReadObjectRecords canUpdateObjectRecords
+        canSoftDeleteObjectRecords canDestroyObjectRecords
+      }
     }
   }`);
 
@@ -174,6 +178,17 @@ try {
       log.pulados.push(`role ${role.label} (já edita tudo)`);
       continue;
     }
+    // upsertObjectPermissions SUBSTITUI a lista inteira da role (apaga o que não
+    // vier no input), então reenvia as permissões atuais junto com as do chat
+    const kept = (role.objectPermissions ?? [])
+      .filter((permission) => !chatObjectIds.includes(permission.objectMetadataId))
+      .map(({ objectMetadataId, canReadObjectRecords, canUpdateObjectRecords, canSoftDeleteObjectRecords, canDestroyObjectRecords }) => ({
+        objectMetadataId,
+        canReadObjectRecords,
+        canUpdateObjectRecords,
+        canSoftDeleteObjectRecords,
+        canDestroyObjectRecords,
+      }));
     try {
       await gql(
         `mutation($input: UpsertObjectPermissionsInput!) {
@@ -182,13 +197,13 @@ try {
         {
           input: {
             roleId: role.id,
-            objectPermissions: chatObjectIds.map((objectMetadataId) => ({
+            objectPermissions: [...kept, ...chatObjectIds.map((objectMetadataId) => ({
               objectMetadataId,
               canReadObjectRecords: true,
               canUpdateObjectRecords: true,
               canSoftDeleteObjectRecords: true,
               canDestroyObjectRecords: false,
-            })),
+            }))],
           },
         },
       );
