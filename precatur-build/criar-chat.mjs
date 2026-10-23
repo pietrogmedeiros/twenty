@@ -1,6 +1,6 @@
 // Provisiona o chat interno por registro (estilo bate-papo do Bitrix) num workspace.
 // Uso: TWENTY_API_KEY=<jwt> node criar-chat.mjs [http://localhost:3000] [objeto1,objeto2,...]
-//   - objetos padrão: negociacao,precatorio,analiseJuridica,processoAdministrativo,pagamento,
+//   - objetos padrão: negociacao,precatorio,analiseJuridica,processoAdministrativo,pagamento,acompanhamentoPosCompra,
 //     oportunidadeSalvador (Filial Salvador)
 //     (os que não existirem no workspace são pulados)
 // Idempotente: pode rodar de novo sem duplicar objetos, campos, permissões ou abas.
@@ -19,7 +19,7 @@ const ENDPOINT = `${BASE_URL}/metadata`;
 const API_KEY = process.env.TWENTY_API_KEY;
 const TARGET_OBJECTS = (
   process.argv[3] ??
-  'negociacao,precatorio,analiseJuridica,processoAdministrativo,pagamento,oportunidadeSalvador'
+  'negociacao,precatorio,analiseJuridica,processoAdministrativo,pagamento,acompanhamentoPosCompra,oportunidadeSalvador'
 )
   .split(',')
   .map((name) => name.trim())

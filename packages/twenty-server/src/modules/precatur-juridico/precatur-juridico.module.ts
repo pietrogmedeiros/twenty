@@ -4,16 +4,19 @@ import { WorkspaceManyOrAllFlatEntityMapsCacheModule } from 'src/engine/metadata
 import { PrecaturJuridicoListener } from 'src/modules/precatur-juridico/listeners/precatur-juridico.listener';
 import { PrecaturJuridicoUpdateManyPreQueryHook } from 'src/modules/precatur-juridico/query-hooks/precatur-juridico.update-many.pre-query-hook';
 import { PrecaturJuridicoUpdateOnePreQueryHook } from 'src/modules/precatur-juridico/query-hooks/precatur-juridico.update-one.pre-query-hook';
+import { PrecaturJuridicoPostPurchaseService } from 'src/modules/precatur-juridico/services/precatur-juridico-post-purchase.service';
 import { PrecaturJuridicoGateService } from 'src/modules/precatur-juridico/services/precatur-juridico-gate.service';
 import { PrecaturJuridicoService } from 'src/modules/precatur-juridico/services/precatur-juridico.service';
 
 // Precatur: etapa "Jurídico" da Negociação espelhada na Análise Jurídica,
-// com o negócio travado até a decisão do jurídico.
+// com o negócio travado até a decisão do jurídico; pagamento ao cedente pago
+// abre o Acompanhamento Pós-Compra.
 @Module({
   imports: [WorkspaceManyOrAllFlatEntityMapsCacheModule],
   providers: [
     PrecaturJuridicoService,
     PrecaturJuridicoGateService,
+    PrecaturJuridicoPostPurchaseService,
     PrecaturJuridicoListener,
     PrecaturJuridicoUpdateOnePreQueryHook,
     PrecaturJuridicoUpdateManyPreQueryHook,

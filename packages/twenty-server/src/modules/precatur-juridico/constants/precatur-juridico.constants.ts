@@ -27,3 +27,14 @@ export const PRECATUR_JURIDICO_DECISION = {
 
 export type PrecaturJuridicoDecision =
   (typeof PRECATUR_JURIDICO_DECISION)[keyof typeof PRECATUR_JURIDICO_DECISION];
+
+// Pagamento ao cedente pago abre o Acompanhamento Pós-Compra (o trabalho
+// jurídico segue até a Precatur receber ou ceder o crédito adiante).
+export const PRECATUR_JURIDICO_PAYMENT_OBJECT_NAME = 'pagamento';
+export const PRECATUR_JURIDICO_PAYMENT_TO_ASSIGNOR_TYPE =
+  'PAGAMENTO_AO_CEDENTE';
+export const PRECATUR_JURIDICO_PAYMENT_PAID_STATUSES = ['PAGO', 'CONCILIADO'];
+
+export const PRECATUR_JURIDICO_POST_PURCHASE_OBJECT_NAME =
+  'acompanhamentoPosCompra';
+export const PRECATUR_JURIDICO_POST_PURCHASE_FIRST_STAGE = 'PETICIONAR_CESSAO';

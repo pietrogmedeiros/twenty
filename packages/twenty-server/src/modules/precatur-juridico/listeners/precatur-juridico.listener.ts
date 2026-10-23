@@ -13,21 +13,27 @@ import {
   PRECATUR_JURIDICO_ANALYSIS_OBJECT_NAME,
   PRECATUR_JURIDICO_DEAL_OBJECT_NAME,
   PRECATUR_JURIDICO_DEAL_STAGE_VALUE,
+  PRECATUR_JURIDICO_PAYMENT_OBJECT_NAME,
 } from 'src/modules/precatur-juridico/constants/precatur-juridico.constants';
+import { PrecaturJuridicoPostPurchaseService } from 'src/modules/precatur-juridico/services/precatur-juridico-post-purchase.service';
 import { PrecaturJuridicoService } from 'src/modules/precatur-juridico/services/precatur-juridico.service';
 import {
   type PrecaturJuridicoAnalysis,
   type PrecaturJuridicoDeal,
+  type PrecaturJuridicoPayment,
 } from 'src/modules/precatur-juridico/types/precatur-juridico.types';
+import { isPrecaturJuridicoPaidToAssignor } from 'src/modules/precatur-juridico/utils/is-precatur-juridico-paid-to-assignor.util';
 
 // Negócio entrou em "Jurídico" → espelha na Análise Jurídica.
 // Status da análise mudou → devolve a decisão para o negócio.
+// Pagamento ao cedente pago → abre o Acompanhamento Pós-Compra.
 @Injectable()
 export class PrecaturJuridicoListener {
   private readonly logger = new Logger(PrecaturJuridicoListener.name);
 
   constructor(
     private readonly precaturJuridicoService: PrecaturJuridicoService,
+    private readonly precaturJuridicoPostPurchaseService: PrecaturJuridicoPostPurchaseService,
   ) {}
 
   @OnDatabaseBatchEvent(
@@ -105,6 +111,57 @@ export class PrecaturJuridicoListener {
           payload.workspaceId,
           dealId,
           after.status,
+        ),
+      );
+    }
+  }
+
+  @OnDatabaseBatchEvent(
+    PRECATUR_JURIDICO_PAYMENT_OBJECT_NAME,
+    DatabaseEventAction.CREATED,
+  )
+  async handlePaymentCreatedEvent(
+    payload: WorkspaceEventBatch<
+      ObjectRecordCreateEvent<PrecaturJuridicoPayment>
+    >,
+  ) {
+    for (const event of payload.events) {
+      const payment = event.properties.after;
+
+      if (isPrecaturJuridicoPaidToAssignor(payment)) {
+        await this.run(() =>
+          this.precaturJuridicoPostPurchaseService.openForPaidPayment(
+            payload.workspaceId,
+            payment.id,
+          ),
+        );
+      }
+    }
+  }
+
+  @OnDatabaseBatchEvent(
+    PRECATUR_JURIDICO_PAYMENT_OBJECT_NAME,
+    DatabaseEventAction.UPDATED,
+  )
+  async handlePaymentUpdatedEvent(
+    payload: WorkspaceEventBatch<
+      ObjectRecordUpdateEvent<PrecaturJuridicoPayment>
+    >,
+  ) {
+    for (const event of payload.events) {
+      const { before, after } = event.properties;
+
+      if (
+        isPrecaturJuridicoPaidToAssignor(before) ||
+        !isPrecaturJuridicoPaidToAssignor(after)
+      ) {
+        continue;
+      }
+
+      await this.run(() =>
+        this.precaturJuridicoPostPurchaseService.openForPaidPayment(
+          payload.workspaceId,
+          after.id,
         ),
       );
     }

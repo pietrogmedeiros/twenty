@@ -16,8 +16,15 @@
 //   5. Regra de etapa: Negociação só entra em "Jurídico" com o escopo do
 //      crédito preenchido (soma às regras que já existirem, não substitui)
 //   6. Role do Jurídico edita o Acompanhamento Pós-Compra
+//   7. Card do Kanban da Análise Jurídica só com o essencial
+//   8. View "Com pendências" na Análise Jurídica (certidão não emitida ou peça
+//      não encontrada/não expedida)
 //
-// Rodar depois de criar-regras-etapa.mjs e criar-espelho-juridico.mjs.
+// O Pós-Compra é aberto pelo servidor (módulo precatur-juridico) quando um
+// Pagamento ao cedente vira Pago; a relação com o Pagamento evita duplicar.
+//
+// Rodar depois de criar-regras-etapa.mjs e criar-espelho-juridico.mjs; depois
+// rodar criar-chat.mjs de novo para o Pós-Compra ganhar o bate-papo.
 
 const BASE_URL = process.argv[2] ?? 'http://localhost:3000';
 const API_KEY = process.env.TWENTY_API_KEY;
@@ -291,11 +298,39 @@ const POS_COMPRA_RELATIONS = [
   ['precatorio', 'Precatório', 'IconFileInvoice', 'precatorio', 'Pós-Compra'],
   ['negociacao', 'Negociação', 'IconBriefcase', 'negociacao', 'Pós-Compra'],
   ['responsavelJuridico', 'Responsável jurídico', 'IconUserShield', 'workspaceMember', 'Pós-Compra (responsável)'],
+  ['pagamento', 'Pagamento ao cedente', 'IconCash', 'pagamento', 'Pós-Compra'],
 ];
 
 const POS_COMPRA_KANBAN = {
   name: 'Pós-compra por etapa',
   cardFields: ['name', 'precatorio', 'responsavelJuridico', 'proximoPrazo', 'entrouNaEtapaEm'],
+};
+
+// Card do Kanban da Análise Jurídica: o resto fica na página do registro
+const ANALISE_CARD_FIELDS = [
+  'name',
+  'negociacao',
+  'risco',
+  'indiceCorrecao',
+  'numeroOficio',
+  'calculoHonorarios',
+  'advogadoResponsavel',
+  'entrouNaEtapaEm',
+];
+
+const ANALISE_PENDENCIAS_VIEW = {
+  name: 'Com pendências',
+  icon: 'IconAlertTriangle',
+  columns: ['name', 'negociacao', 'status', 'advogadoResponsavel', 'pendenciasProvidenciar', 'entrouNaEtapaEm'],
+  // Qualquer um destes (OU)
+  filters: [
+    ...ANALISE_FIELDS.filter((field) => field.name.startsWith('situacaoCertidao')).map(
+      (field) => [field.name, ['NAO_EMITIDA']],
+    ),
+    ...ANALISE_FIELDS.filter(
+      (field) => field.name.startsWith('situacao') && !field.name.startsWith('situacaoCertidao'),
+    ).map((field) => [field.name, ['NAO_ENCONTRADO', 'NAO_EXPEDIDO']]),
+  ],
 };
 
 // Só entra em "Jurídico" com o escopo do crédito definido
@@ -368,7 +403,7 @@ if (!API_KEY) {
 }
 
 await loadObjects();
-for (const name of ['negociacao', 'analiseJuridica', 'precatorio']) {
+for (const name of ['negociacao', 'analiseJuridica', 'precatorio', 'pagamento']) {
   if (!objectByName(name)) {
     console.error(`Objeto ${name} não existe neste workspace`);
     process.exit(1);
@@ -465,6 +500,123 @@ if (getViews.some((view) => view.name === POS_COMPRA_KANBAN.name)) {
     },
   );
   console.log(`  view ${POS_COMPRA_KANBAN.name} criada`);
+}
+
+// 7. Card do Kanban da Análise Jurídica
+const analise = objectByName('analiseJuridica');
+const loadViews = async (objectMetadataId) =>
+  (
+    await metadata(
+      `query($id: String) {
+        getViews(objectMetadataId: $id) {
+          id name type viewFields { id fieldMetadataId isVisible position }
+        }
+      }`,
+      { id: objectMetadataId },
+    )
+  ).getViews;
+let analiseViews = await loadViews(analise.id);
+if (!analiseViews.some((view) => view.type === 'KANBAN')) {
+  await metadata(
+    `mutation($input: CreateViewInput!) { createView(input: $input) { id } }`,
+    {
+      input: {
+        name: 'Jurídico por status',
+        icon: 'IconLayoutKanban',
+        objectMetadataId: analise.id,
+        type: 'KANBAN',
+        mainGroupByFieldMetadataId: fieldId(analise, 'status'),
+        visibility: 'WORKSPACE',
+        position: 1,
+      },
+    },
+  );
+  console.log('Análise Jurídica: Kanban por status criado');
+  analiseViews = await loadViews(analise.id);
+}
+const cardFieldIds = ANALISE_CARD_FIELDS.map((name) => fieldId(analise, name)).filter(Boolean);
+for (const view of analiseViews.filter((item) => item.type === 'KANBAN')) {
+  const toCreate = [];
+  for (const [position, id] of cardFieldIds.entries()) {
+    const existing = view.viewFields.find((vf) => vf.fieldMetadataId === id);
+    if (!existing) {
+      toCreate.push({ viewId: view.id, fieldMetadataId: id, isVisible: true, position });
+    } else if (!existing.isVisible || existing.position !== position) {
+      await metadata(
+        `mutation($input: UpdateViewFieldInput!) { updateViewField(input: $input) { id } }`,
+        { input: { id: existing.id, update: { isVisible: true, position } } },
+      );
+    }
+  }
+  if (toCreate.length > 0) {
+    await metadata(
+      `mutation($inputs: [CreateViewFieldInput!]!) { createManyViewFields(inputs: $inputs) { id } }`,
+      { inputs: toCreate },
+    );
+  }
+  for (const viewField of view.viewFields) {
+    if (viewField.isVisible && !cardFieldIds.includes(viewField.fieldMetadataId)) {
+      await metadata(
+        `mutation($input: UpdateViewFieldInput!) { updateViewField(input: $input) { id } }`,
+        { input: { id: viewField.id, update: { isVisible: false } } },
+      );
+    }
+  }
+  console.log(`Análise Jurídica: card do Kanban "${view.name}" configurado`);
+}
+
+// 8. View "Com pendências"
+if (analiseViews.some((view) => view.name === ANALISE_PENDENCIAS_VIEW.name)) {
+  console.log(`Análise Jurídica: view ${ANALISE_PENDENCIAS_VIEW.name} já existe`);
+} else {
+  const { createView: pendenciasView } = await metadata(
+    `mutation($input: CreateViewInput!) { createView(input: $input) { id } }`,
+    {
+      input: {
+        name: ANALISE_PENDENCIAS_VIEW.name,
+        icon: ANALISE_PENDENCIAS_VIEW.icon,
+        objectMetadataId: analise.id,
+        type: 'TABLE',
+        visibility: 'WORKSPACE',
+        position: 2,
+      },
+    },
+  );
+  await metadata(
+    `mutation($inputs: [CreateViewFieldInput!]!) { createManyViewFields(inputs: $inputs) { id } }`,
+    {
+      inputs: ANALISE_PENDENCIAS_VIEW.columns
+        .map((name) => fieldId(analise, name))
+        .filter(Boolean)
+        .map((fieldMetadataId, position) => ({
+          viewId: pendenciasView.id,
+          fieldMetadataId,
+          isVisible: true,
+          position,
+        })),
+    },
+  );
+  const { createViewFilterGroup } = await metadata(
+    `mutation($input: CreateViewFilterGroupInput!) { createViewFilterGroup(input: $input) { id } }`,
+    { input: { viewId: pendenciasView.id, logicalOperator: 'OR' } },
+  );
+  for (const [position, [name, values]] of ANALISE_PENDENCIAS_VIEW.filters.entries()) {
+    await metadata(
+      `mutation($input: CreateViewFilterInput!) { createViewFilter(input: $input) { id } }`,
+      {
+        input: {
+          viewId: pendenciasView.id,
+          viewFilterGroupId: createViewFilterGroup.id,
+          positionInViewFilterGroup: position,
+          fieldMetadataId: fieldId(analise, name),
+          operand: 'IS',
+          // Seleção: o front guarda a lista de opções como texto JSON
+          value: JSON.stringify(values),
+        },
+      },
+    );
+  }
+  console.log(`Análise Jurídica: view ${ANALISE_PENDENCIAS_VIEW.name} criada`);
 }
 
 // 5. Regra de etapa "Jurídico" (soma aos campos que o cliente já configurou)
