@@ -74,6 +74,8 @@ describe('PrecaturJuridicoService', () => {
       await service.mirrorDealToJuridico(WORKSPACE_ID, DEAL.id);
 
       expect(repositories.analiseJuridica.save).toHaveBeenCalledWith({
+        createdBy: expect.objectContaining({ source: 'SYSTEM' }),
+        updatedBy: expect.objectContaining({ source: 'SYSTEM' }),
         name: DEAL.name,
         status: 'PRE_ANALISE_AUTOMATICA',
         negociacaoId: DEAL.id,

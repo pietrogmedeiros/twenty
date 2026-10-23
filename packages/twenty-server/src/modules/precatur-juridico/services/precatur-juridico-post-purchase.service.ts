@@ -16,6 +16,7 @@ import {
   type PrecaturJuridicoPayment,
   type PrecaturJuridicoPostPurchase,
 } from 'src/modules/precatur-juridico/types/precatur-juridico.types';
+import { buildPrecaturJuridicoSystemActor } from 'src/modules/precatur-juridico/utils/build-precatur-juridico-system-actor.util';
 import { isPrecaturJuridicoPaidToAssignor } from 'src/modules/precatur-juridico/utils/is-precatur-juridico-paid-to-assignor.util';
 
 type PrecaturJuridicoPrecatorio = { id: string; name: string | null };
@@ -71,6 +72,7 @@ export class PrecaturJuridicoPostPurchaseService {
         : { precatorio: null, dealId: null, responsibleId: null };
 
       await postPurchaseRepository.save({
+        ...buildPrecaturJuridicoSystemActor(),
         name: precatorio?.name ?? payment.name,
         etapa: PRECATUR_JURIDICO_POST_PURCHASE_FIRST_STAGE,
         pagamentoId: payment.id,

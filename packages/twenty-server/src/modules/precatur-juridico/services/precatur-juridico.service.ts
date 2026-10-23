@@ -16,6 +16,7 @@ import {
   type PrecaturJuridicoAnalysis,
   type PrecaturJuridicoDeal,
 } from 'src/modules/precatur-juridico/types/precatur-juridico.types';
+import { buildPrecaturJuridicoSystemActor } from 'src/modules/precatur-juridico/utils/build-precatur-juridico-system-actor.util';
 import { getPrecaturJuridicoDecision } from 'src/modules/precatur-juridico/utils/get-precatur-juridico-decision.util';
 
 @Injectable()
@@ -65,6 +66,7 @@ export class PrecaturJuridicoService {
         analysisStatus = PRECATUR_JURIDICO_ANALYSIS_STATUS.PENDING;
 
         await analysisRepository.save({
+          ...buildPrecaturJuridicoSystemActor(),
           name: deal.name,
           status: analysisStatus,
           negociacaoId: dealId,

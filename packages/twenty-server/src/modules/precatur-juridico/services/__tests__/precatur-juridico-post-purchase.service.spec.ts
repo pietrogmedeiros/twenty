@@ -63,6 +63,8 @@ describe('PrecaturJuridicoPostPurchaseService', () => {
     await service.openForPaidPayment(WORKSPACE_ID, PAID_PAYMENT.id);
 
     expect(repositories.acompanhamentoPosCompra.save).toHaveBeenCalledWith({
+      createdBy: expect.objectContaining({ source: 'SYSTEM' }),
+      updatedBy: expect.objectContaining({ source: 'SYSTEM' }),
       name: 'Precatório 123',
       etapa: 'PETICIONAR_CESSAO',
       pagamentoId: 'payment-id',
