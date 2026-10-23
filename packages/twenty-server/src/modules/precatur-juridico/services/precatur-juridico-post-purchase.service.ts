@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
 
 import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
@@ -73,7 +74,9 @@ export class PrecaturJuridicoPostPurchaseService {
 
       await postPurchaseRepository.save({
         ...buildPrecaturJuridicoSystemActor(),
-        name: precatorio?.name ?? payment.name,
+        name: isNonEmptyString(precatorio?.name)
+          ? precatorio.name
+          : payment.name,
         etapa: PRECATUR_JURIDICO_POST_PURCHASE_FIRST_STAGE,
         pagamentoId: payment.id,
         precatorioId: payment.precatorioId,
