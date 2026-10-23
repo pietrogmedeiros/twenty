@@ -10,6 +10,7 @@ import { CalendarQueryHookModule } from 'src/modules/calendar/common/query-hooks
 import { DashboardQueryHookModule } from 'src/modules/dashboard/query-hooks/dashboard-query-hook.module';
 import { MessagingQueryHookModule } from 'src/modules/messaging/common/query-hooks/messaging-query-hook.module';
 import { NoteQueryHookModule } from 'src/modules/note/query-hooks/note-query-hook.module';
+import { PrecaturJuridicoModule } from 'src/modules/precatur-juridico/precatur-juridico.module';
 import { PrecaturStageRulesModule } from 'src/modules/precatur-stage-rules/precatur-stage-rules.module';
 import { TaskQueryHookModule } from 'src/modules/task/query-hooks/task-query-hook.module';
 import { WorkspaceMemberQueryHookModule } from 'src/modules/workspace-member/query-hooks/workspace-member-query-hook.module';
@@ -23,6 +24,7 @@ import { WorkspaceMemberQueryHookModule } from 'src/modules/workspace-member/que
     WorkspaceMemberQueryHookModule,
     NoteQueryHookModule,
     PrecaturStageRulesModule,
+    PrecaturJuridicoModule,
     TaskQueryHookModule,
     DiscoveryModule,
   ],

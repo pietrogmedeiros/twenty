@@ -6,24 +6,7 @@ import { type UpdateManyResolverArgs } from 'src/engine/api/graphql/workspace-re
 import { WorkspaceQueryHook } from 'src/engine/api/graphql/workspace-query-runner/workspace-query-hook/decorators/workspace-query-hook.decorator';
 import { type WorkspaceAuthContext } from 'src/engine/core-modules/auth/types/workspace-auth-context.type';
 import { PrecaturStageRuleValidatorService } from 'src/modules/precatur-stage-rules/services/precatur-stage-rule-validator.service';
-
-type IdFilter = { id?: { in?: string[]; eq?: string } };
-
-// Ações em massa do front mandam filtro por id; outros filtros não são
-// traduzidos aqui e caem na mensagem de "selecione os registros"
-const getRecordIdsFromFilter = (filter: unknown): string[] | null => {
-  const idFilter = (filter as IdFilter | null)?.id;
-
-  if (Array.isArray(idFilter?.in)) {
-    return idFilter.in;
-  }
-
-  if (typeof idFilter?.eq === 'string') {
-    return [idFilter.eq];
-  }
-
-  return null;
-};
+import { getRecordIdsFromFilter } from 'src/modules/precatur-stage-rules/utils/get-record-ids-from-filter.util';
 
 @WorkspaceQueryHook(`*.updateMany`)
 export class PrecaturStageRuleUpdateManyPreQueryHook implements WorkspacePreQueryHookInstance {
