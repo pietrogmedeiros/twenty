@@ -19,6 +19,7 @@
 //   7. Card do Kanban da Análise Jurídica só com o essencial
 //   8. View "Com pendências" na Análise Jurídica (certidão não emitida ou peça
 //      não encontrada/não expedida)
+//   9. Pós-Compra no menu lateral logo abaixo de Análises Jurídicas
 //
 // O Pós-Compra é aberto pelo servidor (módulo precatur-juridico) quando um
 // Pagamento ao cedente vira Pago; a relação com o Pagamento evita duplicar.
@@ -617,6 +618,30 @@ if (analiseViews.some((view) => view.name === ANALISE_PENDENCIAS_VIEW.name)) {
     );
   }
   console.log(`Análise Jurídica: view ${ANALISE_PENDENCIAS_VIEW.name} criada`);
+}
+
+// 9. Menu lateral: Pós-Compra logo abaixo de Análises Jurídicas
+const { navigationMenuItems } = await metadata(
+  `query { navigationMenuItems { id type position targetObjectMetadataId userWorkspaceId folderId } }`,
+);
+const sideMenu = navigationMenuItems.filter((item) => !item.userWorkspaceId && !item.folderId);
+const analiseItem = sideMenu.find((item) => item.targetObjectMetadataId === analise.id);
+const posCompraItem = sideMenu.find((item) => item.targetObjectMetadataId === posCompraAtual.id);
+if (analiseItem && posCompraItem) {
+  const nextPosition = Math.min(
+    ...sideMenu.filter((item) => item.position > analiseItem.position && item.id !== posCompraItem.id).map((item) => item.position),
+    analiseItem.position + 1,
+  );
+  const isRightBelow = posCompraItem.position > analiseItem.position && posCompraItem.position < nextPosition;
+  if (isRightBelow) {
+    console.log('Menu: Pós-Compra já está abaixo de Análises Jurídicas');
+  } else {
+    await metadata(
+      `mutation($input: UpdateOneNavigationMenuItemInput!) { updateNavigationMenuItem(input: $input) { id } }`,
+      { input: { id: posCompraItem.id, update: { position: (analiseItem.position + nextPosition) / 2 } } },
+    );
+    console.log('Menu: Pós-Compra movido para logo abaixo de Análises Jurídicas');
+  }
 }
 
 // 5. Regra de etapa "Jurídico" (soma aos campos que o cliente já configurou)
