@@ -337,7 +337,7 @@ const ANALISE_PENDENCIAS_VIEW = {
 const JURIDICO_STAGE_RULE = {
   objectNameSingular: 'negociacao',
   stageFieldName: 'status',
-  stageValue: 'JURIDICO',
+  stageValue: 'JURIDICO_NO_PIPELINE',
   requiredFieldNames: [
     'numeroProcesso',
     'cedente',
@@ -635,10 +635,15 @@ if (!objectByName('regraEtapa')) {
       },
     },
   );
-  const existing = regrasEtapa.edges[0]?.node;
+  const [existing, ...duplicates] = regrasEtapa.edges.map((edge) => edge.node);
   if (existing) {
-    const current = Array.isArray(existing.requiredFieldNames) ? existing.requiredFieldNames : [];
-    const merged = [...new Set([...current, ...JURIDICO_STAGE_RULE.requiredFieldNames])];
+    // Regras repetidas para a mesma etapa: junta tudo numa só (o servidor só
+    // considera uma delas) e apaga as cópias
+    const fieldsOf = (rule) => (Array.isArray(rule.requiredFieldNames) ? rule.requiredFieldNames : []);
+    const current = fieldsOf(existing);
+    const merged = [
+      ...new Set([...current, ...duplicates.flatMap(fieldsOf), ...JURIDICO_STAGE_RULE.requiredFieldNames]),
+    ];
     if (merged.length === current.length) {
       console.log('Regra de etapa Jurídico já tem os campos');
     } else {
@@ -646,7 +651,11 @@ if (!objectByName('regraEtapa')) {
         `mutation($id: UUID!, $data: RegraEtapaUpdateInput!) { updateRegraEtapa(id: $id, data: $data) { id } }`,
         { id: existing.id, data: { requiredFieldNames: merged } },
       );
-      console.log('Regra de etapa Jurídico atualizada');
+      console.log(`Regra de etapa Jurídico atualizada: ${merged.join(', ')}`);
+    }
+    for (const duplicate of duplicates) {
+      await core(`mutation($id: UUID!) { deleteRegraEtapa(id: $id) { id } }`, { id: duplicate.id });
+      console.log('Regra de etapa Jurídico duplicada apagada');
     }
   } else {
     await core(

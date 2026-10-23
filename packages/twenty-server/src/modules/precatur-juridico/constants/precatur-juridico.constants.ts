@@ -2,13 +2,15 @@
 // a Análise Jurídica e só avança depois da decisão do jurídico.
 export const PRECATUR_JURIDICO_DEAL_OBJECT_NAME = 'negociacao';
 export const PRECATUR_JURIDICO_DEAL_STAGE_FIELD_NAME = 'status';
-export const PRECATUR_JURIDICO_DEAL_STAGE_VALUE = 'JURIDICO';
-export const PRECATUR_JURIDICO_DEAL_REJECTED_STAGE_VALUE = 'RECUSADO';
+// Valor herdado da opção "- {{Jurídico}} no pipeline." (só o rótulo foi
+// trocado, para não quebrar as regras de etapa já gravadas com ele)
+export const PRECATUR_JURIDICO_DEAL_STAGE_VALUE = 'JURIDICO_NO_PIPELINE';
+export const PRECATUR_JURIDICO_DEAL_REJECTED_STAGE_VALUE = 'PERDIDO';
 
 export const PRECATUR_JURIDICO_ANALYSIS_OBJECT_NAME = 'analiseJuridica';
 
 export const PRECATUR_JURIDICO_ANALYSIS_STATUS = {
-  PENDING: 'PENDENTE',
+  PENDING: 'PRE_ANALISE_AUTOMATICA',
   APPROVED: 'APROVADO',
   APPROVED_WITH_CAVEATS: 'COM_RESSALVAS',
   REJECTED: 'REPROVADO',

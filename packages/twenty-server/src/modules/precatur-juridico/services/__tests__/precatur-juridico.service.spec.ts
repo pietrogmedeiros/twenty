@@ -10,7 +10,7 @@ const WORKSPACE_ID = 'workspace-id';
 const DEAL: PrecaturJuridicoDeal = {
   id: 'deal-id',
   name: 'Negociação — MARILZA',
-  status: 'JURIDICO',
+  status: 'JURIDICO_NO_PIPELINE',
   precatorioId: 'precatorio-id',
   decisaoJuridica: null,
 };
@@ -75,7 +75,7 @@ describe('PrecaturJuridicoService', () => {
 
       expect(repositories.analiseJuridica.save).toHaveBeenCalledWith({
         name: DEAL.name,
-        status: 'PENDENTE',
+        status: 'PRE_ANALISE_AUTOMATICA',
         negociacaoId: DEAL.id,
         precatorioId: DEAL.precatorioId,
       });
@@ -95,7 +95,7 @@ describe('PrecaturJuridicoService', () => {
       expect(repositories.analiseJuridica.save).not.toHaveBeenCalled();
       expect(repositories.analiseJuridica.update).toHaveBeenCalledWith(
         { id: 'analysis-id' },
-        { negociacaoId: DEAL.id, status: 'PENDENTE' },
+        { negociacaoId: DEAL.id, status: 'PRE_ANALISE_AUTOMATICA' },
       );
     });
 
@@ -130,14 +130,14 @@ describe('PrecaturJuridicoService', () => {
   });
 
   describe('syncDecisionToDeal', () => {
-    it('should send the deal to Recusado when the analysis is rejected', async () => {
+    it('should send the deal to Perdido when the analysis is rejected', async () => {
       const { service, repositories } = setup({});
 
       await service.syncDecisionToDeal(WORKSPACE_ID, DEAL.id, 'REPROVADO');
 
       expect(repositories.negociacao.update).toHaveBeenCalledWith(
         { id: DEAL.id },
-        { decisaoJuridica: 'REPROVADO', status: 'RECUSADO' },
+        { decisaoJuridica: 'REPROVADO', status: 'PERDIDO' },
       );
     });
 

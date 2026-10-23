@@ -3,9 +3,9 @@
 // Idempotente: pode rodar de novo sem duplicar nada.
 //
 // O que faz:
-//   1. Renomeia a opção "- {{Jurídico}} no pipeline." do Status da Negociação
-//      para "Jurídico" (valor JURIDICO), mantendo o id: os negócios que já
-//      estão nela continuam nela
+//   1. Troca o rótulo da opção "- {{Jurídico}} no pipeline." do Status da
+//      Negociação para "Jurídico". O valor JURIDICO_NO_PIPELINE fica: as regras
+//      de etapa já gravadas usam esse valor
 //   2. Cria em Negociação o campo Decisão jurídica (mostrado no Kanban)
 //   3. Cria a relação Análise Jurídica → Negociação
 //   4. Confere se o Status da Análise Jurídica tem os valores que o servidor usa
@@ -20,8 +20,11 @@ const API_KEY = process.env.TWENTY_API_KEY;
 
 const DEAL_OBJECT = 'negociacao';
 const ANALYSIS_OBJECT = 'analiseJuridica';
-const JURIDICO_VALUE = 'JURIDICO';
-const ANALYSIS_STATUS_VALUES = ['PENDENTE', 'APROVADO', 'COM_RESSALVAS', 'REPROVADO'];
+const JURIDICO_VALUE = 'JURIDICO_NO_PIPELINE';
+const JURIDICO_LABEL = 'Jurídico';
+// Status em que a análise espelhada nasce (e volta, se tinha sido reprovada)
+const ANALYSIS_FIRST_STATUS = 'PRE_ANALISE_AUTOMATICA';
+const ANALYSIS_STATUS_VALUES = [ANALYSIS_FIRST_STATUS, 'APROVADO', 'COM_RESSALVAS', 'REPROVADO'];
 
 const DECISION_FIELD = {
   type: 'SELECT',
@@ -89,16 +92,16 @@ if (!deal || !analysis) {
 // 1. Opção "Jurídico" no Status da Negociação
 const statusField = field(deal, 'status');
 const options = statusField.options ?? [];
-if (options.some((option) => option.value === JURIDICO_VALUE)) {
-  console.log('Status: opção Jurídico já existe');
+const juridicoOption = options.find((option) => option.value === JURIDICO_VALUE);
+if (!juridicoOption) {
+  console.error(
+    `Status da Negociação não tem a opção ${JURIDICO_VALUE}. Opções: ${options.map((option) => `${option.label} [${option.value}]`).join(' | ')}`,
+  );
+  process.exit(1);
+}
+if (juridicoOption.label === JURIDICO_LABEL) {
+  console.log('Status: opção Jurídico já está com o rótulo certo');
 } else {
-  const placeholder = options.find((option) => /jur[ií]dico/i.test(option.label));
-  if (!placeholder) {
-    console.error(
-      `Status da Negociação não tem opção de Jurídico. Opções: ${options.map((option) => option.label).join(' | ')}`,
-    );
-    process.exit(1);
-  }
   await metadata(
     `mutation($input: UpdateOneFieldMetadataInput!) { updateOneField(input: $input) { id } }`,
     {
@@ -106,15 +109,13 @@ if (options.some((option) => option.value === JURIDICO_VALUE)) {
         id: statusField.id,
         update: {
           options: options.map((option) =>
-            option.id === placeholder.id
-              ? { ...option, label: 'Jurídico', value: JURIDICO_VALUE }
-              : option,
+            option.id === juridicoOption.id ? { ...option, label: JURIDICO_LABEL } : option,
           ),
         },
       },
     },
   );
-  console.log(`Status: "${placeholder.label}" (${placeholder.value}) → "Jurídico" (${JURIDICO_VALUE})`);
+  console.log(`Status: "${juridicoOption.label}" → "${JURIDICO_LABEL}"`);
 }
 
 // 2. Decisão jurídica na Negociação
@@ -238,7 +239,7 @@ for (const { node: juridicoDeal } of dealsPage.edges) {
         {
           data: {
             name: juridicoDeal.name,
-            status: 'PENDENTE',
+            status: ANALYSIS_FIRST_STATUS,
             negociacaoId: juridicoDeal.id,
             precatorioId: juridicoDeal.precatorioId,
           },

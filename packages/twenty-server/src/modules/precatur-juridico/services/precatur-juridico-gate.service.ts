@@ -113,7 +113,7 @@ export class PrecaturJuridicoGateService {
             `Deal ${deal.id} was rejected by Jurídico`,
             CommonQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
             {
-              userFriendlyMessage: msg`A Análise Jurídica foi reprovada: o negócio só pode ir para "Recusado" ou voltar de etapa.`,
+              userFriendlyMessage: msg`A Análise Jurídica foi reprovada: o negócio só pode ir para "Perdido" ou voltar de etapa.`,
             },
           );
         }

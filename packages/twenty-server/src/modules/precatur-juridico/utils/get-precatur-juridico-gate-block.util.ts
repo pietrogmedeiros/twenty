@@ -12,7 +12,7 @@ type StageOption = { value: string; position: number };
 export type PrecaturJuridicoGateBlock = 'WAITING_DECISION' | 'REJECTED';
 
 // Bloqueia passar da etapa "Jurídico" (saindo dela ou pulando por cima) sem
-// análise aprovada. Voltar, ficar e ir para "Recusado" são sempre permitidos;
+// análise aprovada. Voltar, ficar e ir para "Perdido" são sempre permitidos;
 // negócio que já estava depois do Jurídico não é afetado.
 export const getPrecaturJuridicoGateBlock = ({
   stageOptions,

@@ -25,7 +25,7 @@ export class PrecaturJuridicoService {
   ) {}
 
   // Negócio entrou em "Jurídico": abre (ou reaproveita) a Análise Jurídica
-  // ligada a ele. Reprovada antes volta para Pendente; aprovada continua valendo.
+  // ligada a ele. Reprovada antes volta para a Pré-análise; aprovada continua valendo.
   async mirrorDealToJuridico(workspaceId: string, dealId: string) {
     await this.inWorkspace(workspaceId, async () => {
       const dealRepository = await this.getDealRepository(workspaceId);
@@ -80,7 +80,7 @@ export class PrecaturJuridicoService {
   }
 
   // Status da análise mudou: reflete a decisão no negócio e, se reprovada,
-  // manda o negócio para "Recusado".
+  // manda o negócio para "Perdido".
   async syncDecisionToDeal(
     workspaceId: string,
     dealId: string,

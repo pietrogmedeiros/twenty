@@ -5,7 +5,7 @@ import {
 } from 'src/modules/precatur-juridico/constants/precatur-juridico.constants';
 
 // Status da Análise Jurídica → decisão mostrada no card do negócio.
-// Qualquer status sem decisão (Pendente, Em análise…) conta como aguardando.
+// Qualquer status sem decisão (Pré-análise, Due, Análise definitiva…) conta como aguardando.
 export const getPrecaturJuridicoDecision = (
   analysisStatus: string | null | undefined,
 ): PrecaturJuridicoDecision => {

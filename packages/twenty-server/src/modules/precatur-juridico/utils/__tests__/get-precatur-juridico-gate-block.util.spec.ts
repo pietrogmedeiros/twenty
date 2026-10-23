@@ -3,9 +3,9 @@ import { getPrecaturJuridicoGateBlock } from 'src/modules/precatur-juridico/util
 const stageOptions = [
   { value: 'PROSPECCAO', position: 0 },
   { value: 'EM_NEGOCIACAO', position: 1 },
-  { value: 'JURIDICO', position: 2 },
+  { value: 'JURIDICO_NO_PIPELINE', position: 2 },
   { value: 'ACEITO', position: 3 },
-  { value: 'RECUSADO', position: 4 },
+  { value: 'PERDIDO', position: 4 },
   { value: 'FECHADO', position: 5 },
 ];
 
@@ -14,7 +14,7 @@ describe('getPrecaturJuridicoGateBlock', () => {
     expect(
       getPrecaturJuridicoGateBlock({
         stageOptions,
-        currentStage: 'JURIDICO',
+        currentStage: 'JURIDICO_NO_PIPELINE',
         targetStage: 'ACEITO',
         decision: 'AGUARDANDO',
       }),
@@ -37,7 +37,7 @@ describe('getPrecaturJuridicoGateBlock', () => {
       expect(
         getPrecaturJuridicoGateBlock({
           stageOptions,
-          currentStage: 'JURIDICO',
+          currentStage: 'JURIDICO_NO_PIPELINE',
           targetStage: 'ACEITO',
           decision,
         }),
@@ -49,19 +49,23 @@ describe('getPrecaturJuridicoGateBlock', () => {
     expect(
       getPrecaturJuridicoGateBlock({
         stageOptions,
-        currentStage: 'JURIDICO',
+        currentStage: 'JURIDICO_NO_PIPELINE',
         targetStage: 'ACEITO',
         decision: 'REPROVADO',
       }),
     ).toBe('REJECTED');
   });
 
-  it('should always allow going back, staying, or moving to Recusado', () => {
-    for (const targetStage of ['EM_NEGOCIACAO', 'JURIDICO', 'RECUSADO']) {
+  it('should always allow going back, staying, or moving to Perdido', () => {
+    for (const targetStage of [
+      'EM_NEGOCIACAO',
+      'JURIDICO_NO_PIPELINE',
+      'PERDIDO',
+    ]) {
       expect(
         getPrecaturJuridicoGateBlock({
           stageOptions,
-          currentStage: 'JURIDICO',
+          currentStage: 'JURIDICO_NO_PIPELINE',
           targetStage,
           decision: 'AGUARDANDO',
         }),
@@ -84,7 +88,7 @@ describe('getPrecaturJuridicoGateBlock', () => {
     expect(
       getPrecaturJuridicoGateBlock({
         stageOptions: stageOptions.filter(
-          (option) => option.value !== 'JURIDICO',
+          (option) => option.value !== 'JURIDICO_NO_PIPELINE',
         ),
         currentStage: 'EM_NEGOCIACAO',
         targetStage: 'FECHADO',
