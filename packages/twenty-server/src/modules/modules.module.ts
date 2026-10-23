@@ -5,6 +5,7 @@ import { ConnectedAccountModule } from 'src/modules/connected-account/connected-
 import { MessagingModule } from 'src/modules/messaging/messaging.module';
 import { PrecaturChatModule } from 'src/modules/precatur-chat/precatur-chat.module';
 import { PrecaturFollowUpModule } from 'src/modules/precatur-follow-up/precatur-follow-up.module';
+import { PrecaturStageEntryModule } from 'src/modules/precatur-stage-entry/precatur-stage-entry.module';
 import { OnboardingInviteSuggestionsModule } from 'src/modules/onboarding-invite-suggestions/onboarding-invite-suggestions.module';
 import { WorkflowModule } from 'src/modules/workflow/workflow.module';
 import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-member.module';
@@ -17,6 +18,7 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     OnboardingInviteSuggestionsModule,
     PrecaturChatModule,
     PrecaturFollowUpModule,
+    PrecaturStageEntryModule,
     WorkflowModule,
     WorkspaceMemberModule,
   ],
