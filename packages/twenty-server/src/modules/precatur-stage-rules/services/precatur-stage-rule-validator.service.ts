@@ -16,6 +16,11 @@ import { findFlatEntityByIdInFlatEntityMaps } from 'src/engine/metadata-modules/
 import { type FlatFieldMetadata } from 'src/engine/metadata-modules/flat-field-metadata/types/flat-field-metadata.type';
 import { buildObjectIdByNameMaps } from 'src/engine/metadata-modules/flat-object-metadata/utils/build-object-id-by-name-maps.util';
 import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
+import { PrecaturDocumentFolderService } from 'src/modules/precatur-documents/services/precatur-document-folder.service';
+import {
+  getPrecaturMissingDocuments,
+  isPrecaturDocumentRuleItem,
+} from 'src/modules/precatur-documents/utils/get-precatur-missing-documents.util';
 import { PRECATUR_STAGE_RULE_OBJECT_NAME } from 'src/modules/precatur-stage-rules/constants/precatur-stage-rule-object-name.constant';
 import { isPrecaturStageRuleFieldFilled } from 'src/modules/precatur-stage-rules/utils/is-precatur-stage-rule-field-filled.util';
 
@@ -29,6 +34,11 @@ type StageRuleRecord = {
 type RecordValues = Record<string, unknown>;
 
 type SelectOption = { value: string; label: string; position: number };
+
+type DocumentTypesByRecordId = {
+  documentTypeLabelByValue: Map<string, string>;
+  typesByRecordId: Map<string, Set<string>>;
+};
 
 // Compostos chegam parciais no update (ex.: só amountMicros): junta com o salvo
 const mergeRecordWithUpdate = (
@@ -71,6 +81,7 @@ export class PrecaturStageRuleValidatorService {
   constructor(
     private readonly flatEntityMapsCacheService: WorkspaceManyOrAllFlatEntityMapsCacheService,
     private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
+    private readonly precaturDocumentFolderService: PrecaturDocumentFolderService,
   ) {}
 
   async validateStageChange({
@@ -175,8 +186,16 @@ export class PrecaturStageRuleValidatorService {
         where: { id: In(recordIds) },
       });
 
+      const documentTypesByRecordId = await this.getDocumentTypesByRecordId({
+        workspaceId,
+        objectName,
+        rules,
+        records: records.map((record) => mergeRecordWithUpdate(record, data)),
+      });
+
       for (const stageField of changedStageFields) {
         this.assertRequiredFieldsForStageField({
+          documentTypesByRecordId,
           stageField,
           rules: rules.filter(
             (rule) => rule.stageFieldName === stageField.name,
@@ -189,13 +208,62 @@ export class PrecaturStageRuleValidatorService {
     }, authContext);
   }
 
+  // Só consulta a pasta quando alguma regra exige documento
+  private async getDocumentTypesByRecordId({
+    workspaceId,
+    objectName,
+    rules,
+    records,
+  }: {
+    workspaceId: string;
+    objectName: string;
+    rules: StageRuleRecord[];
+    records: RecordValues[];
+  }): Promise<DocumentTypesByRecordId | null> {
+    const hasDocumentRule = rules.some(
+      (rule) =>
+        Array.isArray(rule.requiredFieldNames) &&
+        rule.requiredFieldNames.some(
+          (item) =>
+            typeof item === 'string' && isPrecaturDocumentRuleItem(item),
+        ),
+    );
+
+    if (!hasDocumentRule) {
+      return null;
+    }
+
+    const folderContext =
+      await this.precaturDocumentFolderService.getFolderContext(
+        workspaceId,
+        objectName,
+      );
+
+    if (!isDefined(folderContext)) {
+      return null;
+    }
+
+    return {
+      documentTypeLabelByValue: folderContext.documentTypeLabelByValue,
+      typesByRecordId:
+        await this.precaturDocumentFolderService.getDocumentTypesByRecordId({
+          workspaceId,
+          objectName,
+          records,
+          folderContext,
+        }),
+    };
+  }
+
   private assertRequiredFieldsForStageField({
+    documentTypesByRecordId,
     stageField,
     rules,
     records,
     data,
     objectFields,
   }: {
+    documentTypesByRecordId: DocumentTypesByRecordId | null;
     stageField: FlatFieldMetadata;
     rules: StageRuleRecord[];
     records: RecordValues[];
@@ -271,6 +339,21 @@ export class PrecaturStageRuleValidatorService {
           missingFieldLabels.add(field.label);
         }
       }
+
+      // Workspace sem pasta de documentos ativada: itens "documento:" são ignorados
+      if (isDefined(documentTypesByRecordId)) {
+        for (const documentLabel of getPrecaturMissingDocuments({
+          ruleItems: [...requiredFieldNames],
+          record: recordAfterUpdate,
+          presentDocumentTypes:
+            documentTypesByRecordId.typesByRecordId.get(String(record.id)) ??
+            new Set(),
+          documentTypeLabelByValue:
+            documentTypesByRecordId.documentTypeLabelByValue,
+        })) {
+          missingFieldLabels.add(`documento ${documentLabel}`);
+        }
+      }
     }
 
     if (missingFieldLabels.size === 0) {
@@ -284,7 +367,7 @@ export class PrecaturStageRuleValidatorService {
       `Missing required fields for stage ${targetOption.value}: ${fieldLabels}`,
       CommonQueryRunnerExceptionCode.INVALID_QUERY_INPUT,
       {
-        userFriendlyMessage: msg`Para mover para "${stageLabel}", preencha: ${fieldLabels}.`,
+        userFriendlyMessage: msg`Para mover para "${stageLabel}", falta: ${fieldLabels}.`,
       },
     );
   }

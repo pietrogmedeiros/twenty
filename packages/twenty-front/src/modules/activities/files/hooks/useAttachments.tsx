@@ -3,10 +3,20 @@ import { type ActivityTargetableObject } from '@/activities/types/ActivityTarget
 import { getActivityTargetObjectFieldIdName } from '@/activities/utils/getActivityTargetObjectFieldIdName';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
 import { useFindManyRecords } from '@/object-record/hooks/useFindManyRecords';
-export const useAttachments = (targetableObject: ActivityTargetableObject) => {
-  const targetableObjectFieldIdName = getActivityTargetObjectFieldIdName({
-    nameSingular: targetableObject.targetObjectNameSingular,
-  });
+// Precatur: aceita vários alvos para a aba Arquivos mostrar a pasta do
+// precatório junto com os anexos do próprio card
+export const useAttachments = (
+  targetableObjects: ActivityTargetableObject | ActivityTargetableObject[],
+) => {
+  const targetFilters = (
+    Array.isArray(targetableObjects) ? targetableObjects : [targetableObjects]
+  ).map((targetableObject) => ({
+    [getActivityTargetObjectFieldIdName({
+      nameSingular: targetableObject.targetObjectNameSingular,
+    })]: {
+      eq: targetableObject.id,
+    },
+  }));
 
   const {
     records: attachments,
@@ -14,11 +24,8 @@ export const useAttachments = (targetableObject: ActivityTargetableObject) => {
     totalCount,
   } = useFindManyRecords<Attachment>({
     objectNameSingular: CoreObjectNameSingular.Attachment,
-    filter: {
-      [targetableObjectFieldIdName]: {
-        eq: targetableObject.id,
-      },
-    },
+    filter:
+      targetFilters.length === 1 ? targetFilters[0] : { or: targetFilters },
     orderBy: [
       {
         createdAt: 'DescNullsFirst',

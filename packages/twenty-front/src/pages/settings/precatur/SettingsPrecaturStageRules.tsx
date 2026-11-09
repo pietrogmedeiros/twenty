@@ -1,4 +1,5 @@
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
+import { getPrecaturDocumentRuleCandidates } from '@/precatur-documents/utils/getPrecaturDocumentRuleCandidates';
 import { PrecaturStageRuleStageCard } from '@/precatur-stage-rules/components/PrecaturStageRuleStageCard';
 import { PRECATUR_STAGE_RULE_OBJECT_NAME } from '@/precatur-stage-rules/constants/PrecaturStageRuleObjectName';
 import { useIsPrecaturStageRulesEnabled } from '@/precatur-stage-rules/hooks/useIsPrecaturStageRulesEnabled';
@@ -124,10 +125,14 @@ const SettingsPrecaturStageRulesContent = () => {
     stageFieldName,
   });
 
-  const candidateFields = getPrecaturStageRuleCandidateFields(
-    selectedObject?.fields ?? [],
-    stageFieldName,
-  );
+  // Precatur: documentos da pasta do processo entram como itens exigíveis
+  const candidateFields = [
+    ...getPrecaturStageRuleCandidateFields(
+      selectedObject?.fields ?? [],
+      stageFieldName,
+    ),
+    ...getPrecaturDocumentRuleCandidates(objectMetadataItems, selectedObject),
+  ];
 
   const stageOptions = [...(stageField?.options ?? [])].sort(
     (optionA, optionB) => optionA.position - optionB.position,
@@ -194,7 +199,7 @@ const SettingsPrecaturStageRulesContent = () => {
       <Section>
         <H2Title
           title="Campos obrigatórios por etapa"
-          description="Para avançar para uma etapa, os campos marcados nela precisam estar preenchidos. Pular etapas soma as regras das etapas puladas; voltar de etapa é sempre permitido. Caixas de seleção contam como preenchidas só quando marcadas."
+          description="Para avançar para uma etapa, os campos marcados nela precisam estar preenchidos. Pular etapas soma as regras das etapas puladas; voltar de etapa é sempre permitido. Caixas de seleção contam como preenchidas só quando marcadas. Itens “Documento” exigem um arquivo daquele tipo na aba Arquivos (pasta do precatório)."
         />
         <StyledStages>
           {stageOptions.map((stageOption) => (

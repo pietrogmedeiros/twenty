@@ -14,6 +14,9 @@ import { useState, useContext } from 'react';
 import { getSafeUrl, isDefined } from 'twenty-shared/utils';
 
 import { type AttachmentWithFile } from '@/activities/files/utils/filterAttachmentsWithFile';
+import { type FieldMetadataItemOption } from '@/object-metadata/types/FieldMetadataItem';
+import { PrecaturAttachmentDocumentTypeTag } from '@/precatur-documents/components/PrecaturAttachmentDocumentTypeTag';
+import { PRECATUR_DOCUMENT_FOLDER } from '@/precatur-documents/constants/PrecaturDocumentFolder';
 import { FileIcon } from '@/file/components/FileIcon';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { CoreObjectNameSingular } from 'twenty-shared/types';
@@ -74,11 +77,13 @@ const StyledLinkContainer = styled.div`
 
 type AttachmentRowProps = {
   attachment: AttachmentWithFile;
+  documentTypeOptions?: FieldMetadataItemOption[] | null;
   onPreview?: (attachment: AttachmentWithFile) => void;
 };
 
 export const AttachmentRow = ({
   attachment,
+  documentTypeOptions,
   onPreview,
 }: AttachmentRowProps) => {
   const { theme } = useContext(ThemeContext);
@@ -202,6 +207,17 @@ export const AttachmentRow = ({
           )}
         </StyledLeftContent>
         <StyledRightContent>
+          {isDefined(documentTypeOptions) && documentTypeOptions.length > 0 && (
+            <PrecaturAttachmentDocumentTypeTag
+              attachmentId={attachment.id}
+              documentType={
+                (attachment as Record<string, unknown>)[
+                  PRECATUR_DOCUMENT_FOLDER.documentTypeFieldName
+                ] as string | null | undefined
+              }
+              documentTypeOptions={documentTypeOptions}
+            />
+          )}
           <StyledCalendarIconContainer>
             <IconCalendar size={theme.icon.size.md} />
           </StyledCalendarIconContainer>

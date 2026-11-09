@@ -9,6 +9,9 @@ import { useUploadAttachmentFile } from '@/activities/files/hooks/useUploadAttac
 import { useObjectMetadataItem } from '@/object-metadata/hooks/useObjectMetadataItem';
 import { useObjectPermissionsForObject } from '@/object-record/hooks/useObjectPermissionsForObject';
 import { usePublishWidgetHeaderInfo } from '@/page-layout/widgets/hooks/usePublishWidgetHeaderInfo';
+import { PrecaturDocumentTypePicker } from '@/precatur-documents/components/PrecaturDocumentTypePicker';
+import { PRECATUR_DOCUMENT_FOLDER } from '@/precatur-documents/constants/PrecaturDocumentFolder';
+import { usePrecaturDocumentFolder } from '@/precatur-documents/hooks/usePrecaturDocumentFolder';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { useTargetRecord } from '@/ui/layout/contexts/useTargetRecord';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -43,28 +46,69 @@ const StyledDropZoneContainer = styled.div`
 export const FilesCard = () => {
   const targetRecord = useTargetRecord();
   const inputFileRef = useRef<HTMLInputElement>(null);
-  const { attachments, loading, totalCountAttachments } =
-    useAttachments(targetRecord);
+  // Precatur: pasta do processo = anexos do precatório ligado ao card
+  const documentFolder = usePrecaturDocumentFolder(targetRecord);
+  const { attachments, loading, totalCountAttachments } = useAttachments(
+    documentFolder.displayTargets,
+  );
   const { uploadAttachmentFile } = useUploadAttachmentFile();
 
   const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const [filesWaitingForType, setFilesWaitingForType] = useState<File[]>([]);
 
   const { t } = useLingui();
 
-  const onUploadFile = async (file: File) => {
-    await uploadAttachmentFile(file, targetRecord);
+  const uploadFiles = async (
+    files: File[],
+    additionalFields: Record<string, unknown> = {},
+  ) => {
+    for (const file of files) {
+      await uploadAttachmentFile(
+        file,
+        documentFolder.uploadTarget,
+        additionalFields,
+      );
+    }
   };
 
   const onUploadFiles = async (files: File[]) => {
-    for (const file of files) {
-      await onUploadFile(file);
+    const hasDocumentTypes =
+      (documentFolder.documentTypeOptions?.length ?? 0) > 0;
+
+    if (hasDocumentTypes) {
+      setFilesWaitingForType((previous) => [...previous, ...files]);
+      return;
     }
+
+    await uploadFiles(files);
   };
+
+  const handleDocumentTypeSelected = async (documentType: string) => {
+    const files = filesWaitingForType;
+
+    setFilesWaitingForType([]);
+    await uploadFiles(files, {
+      [PRECATUR_DOCUMENT_FOLDER.documentTypeFieldName]: documentType,
+    });
+  };
+
+  const documentTypePicker =
+    filesWaitingForType.length > 0 &&
+    isDefined(documentFolder.documentTypeOptions) ? (
+      <PrecaturDocumentTypePicker
+        files={filesWaitingForType}
+        documentTypeOptions={documentFolder.documentTypeOptions}
+        onSelect={handleDocumentTypeSelected}
+        onCancel={() => setFilesWaitingForType([])}
+      />
+    ) : null;
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isDefined(e.target.files)) {
       onUploadFiles(Array.from(e.target.files));
     }
+    // Permite escolher o mesmo arquivo de novo depois de cancelar
+    e.target.value = '';
   };
 
   const handleUploadFileClick = () => {
@@ -115,6 +159,7 @@ export const FilesCard = () => {
       <StyledDropZoneContainer
         onDragEnter={() => canUploadFiles && setIsDraggingFile(true)}
       >
+        {documentTypePicker}
         {isDraggingFile && canUploadFiles ? (
           <DropZone
             setIsDraggingFile={setIsDraggingFile}
@@ -159,9 +204,11 @@ export const FilesCard = () => {
         type="file"
         multiple
       />
+      {documentTypePicker}
       <AttachmentList
-        targetableObject={targetRecord}
         attachments={attachments ?? []}
+        onUploadFiles={onUploadFiles}
+        documentTypeOptions={documentFolder.documentTypeOptions}
       />
     </StyledAttachmentsContainer>
   );

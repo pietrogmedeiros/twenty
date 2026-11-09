@@ -4,7 +4,9 @@ import { CalendarModule } from 'src/modules/calendar/calendar.module';
 import { ConnectedAccountModule } from 'src/modules/connected-account/connected-account.module';
 import { MessagingModule } from 'src/modules/messaging/messaging.module';
 import { PrecaturChatModule } from 'src/modules/precatur-chat/precatur-chat.module';
+import { PrecaturDocumentsModule } from 'src/modules/precatur-documents/precatur-documents.module';
 import { PrecaturFollowUpModule } from 'src/modules/precatur-follow-up/precatur-follow-up.module';
+import { PrecaturPaymentAlertsModule } from 'src/modules/precatur-payment-alerts/precatur-payment-alerts.module';
 import { PrecaturStageEntryModule } from 'src/modules/precatur-stage-entry/precatur-stage-entry.module';
 import { OnboardingInviteSuggestionsModule } from 'src/modules/onboarding-invite-suggestions/onboarding-invite-suggestions.module';
 import { WorkflowModule } from 'src/modules/workflow/workflow.module';
@@ -17,7 +19,9 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     ConnectedAccountModule,
     OnboardingInviteSuggestionsModule,
     PrecaturChatModule,
+    PrecaturDocumentsModule,
     PrecaturFollowUpModule,
+    PrecaturPaymentAlertsModule,
     PrecaturStageEntryModule,
     WorkflowModule,
     WorkspaceMemberModule,

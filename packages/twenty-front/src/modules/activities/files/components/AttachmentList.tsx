@@ -4,10 +4,9 @@ import { lazy, Suspense, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { DropZone } from '@/activities/files/components/DropZone';
-import { useUploadAttachmentFile } from '@/activities/files/hooks/useUploadAttachmentFile';
 import { type Attachment } from '@/activities/files/types/Attachment';
 import { downloadFile } from '@/activities/files/utils/downloadFile';
-import { type ActivityTargetableObject } from '@/activities/types/ActivityTargetableEntity';
+import { type FieldMetadataItemOption } from '@/object-metadata/types/FieldMetadataItem';
 import { isAttachmentPreviewEnabledState } from '@/client-config/states/isAttachmentPreviewEnabledState';
 import { ModalStatefulWrapper } from '@/ui/layout/modal/components/ModalStatefulWrapper';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
@@ -36,8 +35,10 @@ const DocumentViewer = lazy(() =>
 );
 
 type AttachmentListProps = {
-  targetableObject: ActivityTargetableObject;
   attachments: Attachment[];
+  // Precatur: quem chama decide onde gravar e se pergunta o tipo
+  onUploadFiles: (files: File[]) => Promise<void>;
+  documentTypeOptions?: FieldMetadataItemOption[] | null;
 };
 
 const StyledContainer = styled.div`
@@ -94,10 +95,10 @@ const StyledButtonContainer = styled.div`
 export const PREVIEW_MODAL_ID = 'preview-modal';
 
 export const AttachmentList = ({
-  targetableObject,
   attachments,
+  onUploadFiles,
+  documentTypeOptions,
 }: AttachmentListProps) => {
-  const { uploadAttachmentFile } = useUploadAttachmentFile();
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const [previewedAttachment, setPreviewedAttachment] =
     useState<AttachmentWithFile | null>(null);
@@ -117,16 +118,6 @@ export const AttachmentList = ({
   const { openModal, closeModal } = useModal();
 
   const attachmentsWithFile = filterAttachmentsWithFile(attachments);
-
-  const onUploadFile = async (file: File) => {
-    await uploadAttachmentFile(file, targetableObject);
-  };
-
-  const onUploadFiles = async (files: File[]) => {
-    for (const file of files) {
-      await onUploadFile(file);
-    }
-  };
 
   const handlePreview = (attachment: AttachmentWithFile) => {
     if (!isAttachmentPreviewEnabled) return;
@@ -163,6 +154,7 @@ export const AttachmentList = ({
                   <AttachmentRow
                     key={attachment.id}
                     attachment={attachment}
+                    documentTypeOptions={documentTypeOptions}
                     onPreview={
                       isAttachmentPreviewEnabled ? handlePreview : undefined
                     }

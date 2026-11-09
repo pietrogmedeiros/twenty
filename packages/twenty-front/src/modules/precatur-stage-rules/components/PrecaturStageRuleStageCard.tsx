@@ -1,7 +1,5 @@
-import {
-  type FieldMetadataItem,
-  type FieldMetadataItemOption,
-} from '@/object-metadata/types/FieldMetadataItem';
+import { type FieldMetadataItemOption } from '@/object-metadata/types/FieldMetadataItem';
+import { type PrecaturStageRuleCandidate } from '@/precatur-stage-rules/types/PrecaturStageRuleCandidate';
 import { PrecaturStageRuleFieldPicker } from '@/precatur-stage-rules/components/PrecaturStageRuleFieldPicker';
 import { styled } from '@linaria/react';
 import { useState } from 'react';
@@ -69,7 +67,7 @@ const StyledRemoveChip = styled.button`
 
 type PrecaturStageRuleStageCardProps = {
   stageOption: FieldMetadataItemOption;
-  candidateFields: FieldMetadataItem[];
+  candidateFields: PrecaturStageRuleCandidate[];
   requiredFieldNames: string[];
   onChange: (requiredFieldNames: string[]) => void;
 };
@@ -98,10 +96,10 @@ export const PrecaturStageRuleStageCard = ({
 
   const countLabel =
     requiredFields.length === 0
-      ? 'Sem campos obrigatórios'
+      ? 'Sem itens obrigatórios'
       : requiredFields.length === 1
-        ? '1 campo obrigatório'
-        : `${requiredFields.length} campos obrigatórios`;
+        ? '1 item obrigatório'
+        : `${requiredFields.length} itens obrigatórios`;
 
   return (
     <StyledCard>
@@ -113,7 +111,7 @@ export const PrecaturStageRuleStageCard = ({
         <Button
           size="small"
           variant="secondary"
-          title={isEditing ? 'Concluir' : 'Editar campos'}
+          title={isEditing ? 'Concluir' : 'Editar obrigatórios'}
           Icon={isEditing ? IconChevronUp : IconChevronDown}
           onClick={() => setIsEditing((previous) => !previous)}
         />

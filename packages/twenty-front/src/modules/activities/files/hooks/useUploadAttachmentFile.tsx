@@ -28,6 +28,8 @@ export const useUploadAttachmentFile = () => {
   const uploadAttachmentFile = async (
     file: File,
     targetableObject: ActivityTargetableObject,
+    // Precatur: campos extras do anexo (ex.: tipoDocumento)
+    additionalFields: Record<string, unknown> = {},
   ) => {
     assertIsDefinedOrThrow(
       filesFieldMetadataId,
@@ -48,6 +50,7 @@ export const useUploadAttachmentFile = () => {
     });
 
     const attachmentToCreate = {
+      ...additionalFields,
       name: file.name,
       [targetableObjectFieldIdName]: targetableObject.id,
       file: [

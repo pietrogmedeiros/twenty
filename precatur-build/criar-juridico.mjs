@@ -204,13 +204,12 @@ const POS_COMPRA_OBJECT = {
     'Acompanhamento jurídico depois da cessão, até o recebimento pela Precatur ou nova cessão (Precatur)',
 };
 
-// Provisórias: substituir pelas etapas que o jurídico (Victor) mandar
+// Conferência de cálculos e impugnação não são etapas (jurídico, nov/2026):
+// viram campos dentro de "Aguardando pagamento" — ver atualizar-pos-compra.mjs
 const POS_COMPRA_ETAPAS = [
   ['PETICIONAR_CESSAO', 'Peticionar cessão', 'blue'],
   ['AGUARDANDO_HOMOLOGACAO', 'Aguardando homologação da cessão', 'yellow'],
   ['CESSAO_HOMOLOGADA', 'Cessão homologada', 'turquoise'],
-  ['CONFERENCIA_CALCULOS', 'Conferência de cálculos', 'sky'],
-  ['IMPUGNACAO', 'Impugnação', 'orange'],
   ['AGUARDANDO_PAGAMENTO', 'Aguardando pagamento', 'purple'],
   ['RECEBIDO', 'Recebido pela Precatur', 'green'],
   ['CEDIDO_A_TERCEIRO', 'Cedido a terceiro', 'gray'],

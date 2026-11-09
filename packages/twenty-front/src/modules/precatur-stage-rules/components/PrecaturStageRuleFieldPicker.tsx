@@ -1,4 +1,4 @@
-import { type FieldMetadataItem } from '@/object-metadata/types/FieldMetadataItem';
+import { type PrecaturStageRuleCandidate } from '@/precatur-stage-rules/types/PrecaturStageRuleCandidate';
 import { styled } from '@linaria/react';
 import { useState } from 'react';
 import { IconSearch } from 'twenty-ui/icon';
@@ -78,7 +78,7 @@ const normalize = (value: string) =>
     .toLowerCase();
 
 type PrecaturStageRuleFieldPickerProps = {
-  candidateFields: FieldMetadataItem[];
+  candidateFields: PrecaturStageRuleCandidate[];
   selectedFieldNames: string[];
   onToggle: (fieldName: string, isSelected: boolean) => void;
 };
@@ -100,12 +100,12 @@ export const PrecaturStageRuleFieldPicker = ({
         <IconSearch size={14} />
         <StyledSearchInput
           value={searchText}
-          placeholder="Buscar campo"
+          placeholder="Buscar campo ou documento"
           onChange={(event) => setSearchText(event.target.value)}
         />
       </StyledSearch>
       {visibleFields.length === 0 ? (
-        <StyledEmpty>Nenhum campo encontrado.</StyledEmpty>
+        <StyledEmpty>Nada encontrado.</StyledEmpty>
       ) : (
         <StyledList>
           {visibleFields.map((field) => {
