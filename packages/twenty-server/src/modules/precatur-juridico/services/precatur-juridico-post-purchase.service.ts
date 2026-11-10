@@ -25,6 +25,7 @@ type PrecaturJuridicoPrecatorio = { id: string; name: string | null };
 type PrecaturJuridicoAnalysisOwner = {
   id: string;
   negociacaoId: string | null;
+  precatorioId: string | null;
   advogadoResponsavelId: string | null;
   createdAt: string;
 };

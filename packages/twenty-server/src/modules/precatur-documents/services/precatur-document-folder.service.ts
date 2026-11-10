@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { capitalize, isDefined } from 'twenty-shared/utils';
 import { In } from 'typeorm';
+import { type QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 import { getFlatFieldsFromFlatObjectMetadata } from 'src/engine/api/graphql/workspace-schema-builder/utils/get-flat-fields-for-flat-object-metadata.util';
 import { WorkspaceManyOrAllFlatEntityMapsCacheService } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.service';
@@ -210,10 +211,10 @@ export class PrecaturDocumentFolderService {
         );
 
       for (const [recordId, folderId] of folderIdByRecordId) {
-        await attachmentRepository.update(
-          { [recordTargetIdName]: recordId },
-          { [FOLDER_TARGET_ID_NAME]: folderId, [recordTargetIdName]: null },
-        );
+        await attachmentRepository.update({ [recordTargetIdName]: recordId }, {
+          [FOLDER_TARGET_ID_NAME]: folderId,
+          [recordTargetIdName]: null,
+        } as QueryDeepPartialEntity<AttachmentRecord>);
       }
     }, buildSystemAuthContext(workspaceId));
   }

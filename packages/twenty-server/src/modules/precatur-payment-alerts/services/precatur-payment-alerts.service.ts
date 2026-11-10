@@ -16,6 +16,7 @@ import { getPrecaturDuePaymentAlerts } from 'src/modules/precatur-payment-alerts
 type PostPurchaseRecord = {
   id: string;
   name: string | null;
+  etapa: string | null;
   previsaoPagamento: string | null;
   alertasPagamentoEnviados: string[] | null;
   responsavelJuridicoId: string | null;

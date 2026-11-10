@@ -8,6 +8,7 @@ export const PRECATUR_STAGE_ENTRY_STAGE_FIELD_BY_OBJECT: Record<
   negociacao: 'status',
   analiseJuridica: 'status',
   acompanhamentoPosCompra: 'etapa',
+  direitoCreditorio: 'etapa',
   oportunidadeSalvador: 'etapa',
 };
 

@@ -36,6 +36,7 @@ import { UpgradeModule } from 'src/engine/core-modules/upgrade/upgrade.module';
 import { WorkspaceEntity } from 'src/engine/core-modules/workspace/workspace.entity';
 import { WorkspaceModule } from 'src/engine/core-modules/workspace/workspace.module';
 import { PrecaturPaymentAlertsModule } from 'src/modules/precatur-payment-alerts/precatur-payment-alerts.module';
+import { PrecaturDocumentReminderModule } from 'src/modules/precatur-document-reminders/precatur-document-reminder.module';
 import { PrecaturFollowUpModule } from 'src/modules/precatur-follow-up/precatur-follow-up.module';
 import { FieldMetadataModule } from 'src/engine/metadata-modules/field-metadata/field-metadata.module';
 import { ObjectMetadataModule } from 'src/engine/metadata-modules/object-metadata/object-metadata.module';
@@ -72,6 +73,7 @@ import { WorkflowCoreConsistencyModule } from 'src/modules/workflow/workflow-cor
     WorkspaceModule,
     PrecaturFollowUpModule,
     PrecaturPaymentAlertsModule,
+    PrecaturDocumentReminderModule,
     WorkflowRunQueueModule,
     // Data seeding dependencies
     TypeORMModule,

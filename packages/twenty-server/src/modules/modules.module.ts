@@ -4,6 +4,8 @@ import { CalendarModule } from 'src/modules/calendar/calendar.module';
 import { ConnectedAccountModule } from 'src/modules/connected-account/connected-account.module';
 import { MessagingModule } from 'src/modules/messaging/messaging.module';
 import { PrecaturChatModule } from 'src/modules/precatur-chat/precatur-chat.module';
+import { PrecaturDireitoCreditorioModule } from 'src/modules/precatur-direito-creditorio/precatur-direito-creditorio.module';
+import { PrecaturDocumentReminderModule } from 'src/modules/precatur-document-reminders/precatur-document-reminder.module';
 import { PrecaturDocumentsModule } from 'src/modules/precatur-documents/precatur-documents.module';
 import { PrecaturFollowUpModule } from 'src/modules/precatur-follow-up/precatur-follow-up.module';
 import { PrecaturPaymentAlertsModule } from 'src/modules/precatur-payment-alerts/precatur-payment-alerts.module';
@@ -19,6 +21,8 @@ import { WorkspaceMemberModule } from 'src/modules/workspace-member/workspace-me
     ConnectedAccountModule,
     OnboardingInviteSuggestionsModule,
     PrecaturChatModule,
+    PrecaturDireitoCreditorioModule,
+    PrecaturDocumentReminderModule,
     PrecaturDocumentsModule,
     PrecaturFollowUpModule,
     PrecaturPaymentAlertsModule,
