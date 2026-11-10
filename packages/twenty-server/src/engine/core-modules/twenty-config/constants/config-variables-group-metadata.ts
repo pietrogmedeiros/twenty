@@ -147,11 +147,4 @@ export const CONFIG_VARIABLES_GROUP_METADATA: Record<
     isHiddenOnLoad: true,
     isHiddenInAdminPanel: false,
   },
-  [ConfigVariablesGroup.PRECATUR_AUTOMATIONS]: {
-    position: 2300,
-    description:
-      'Precatur: automações do CRM (cobrança de documentos e avisos internos)',
-    isHiddenOnLoad: true,
-    isHiddenInAdminPanel: false,
-  },
 };

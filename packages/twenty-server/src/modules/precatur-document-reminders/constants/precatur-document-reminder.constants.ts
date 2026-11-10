@@ -14,6 +14,9 @@ export const PRECATUR_DOCUMENT_REMINDER = {
     'documento:DOCUMENTO_PESSOAL',
   ],
   maxReminders: 5,
+  // Gestor comercial avisado no fim (Configurações → Regras de etapa)
+  settingsObjectName: 'configuracaoPrecatur',
+  managerSettingKey: 'COBRANCA_DOCUMENTOS_GESTOR',
   fields: {
     status: 'cobrancaDocumentos',
     sentCount: 'cobrancaDocumentosEnviadas',

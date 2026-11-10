@@ -15,6 +15,8 @@
 //   3. Kanban, menu (abaixo do Pós-Compra) e role do Jurídico editando.
 //   4. Campos da cobrança de documentos na Análise Jurídica (preenchidos pelo
 //      servidor — módulo precatur-document-reminders).
+//   5. Objeto Configurações Precatur (fora do menu): guarda o gestor comercial
+//      avisado no fim da cobrança, escolhido em Configurações → Regras de etapa.
 
 const BASE_URL = process.argv[2]?.startsWith('http') ? process.argv[2] : 'http://localhost:3000';
 const APPLY = process.argv.includes('--aplicar');
@@ -388,6 +390,44 @@ if (!direito) {
         core(`mutation($data: RegraEtapaCreateInput!) { createRegraEtapa(data: $data) { id } }`, { data: STAGE_RULE }),
       );
     }
+  }
+}
+
+// 5. Configurações do workspace (gestor da cobrança, escolhido em
+//    Configurações → Regras de etapa). Objeto técnico: fica fora do menu.
+console.log('5. Configurações Precatur');
+const SETTINGS_OBJECT = {
+  nameSingular: 'configuracaoPrecatur',
+  namePlural: 'configuracoesPrecatur',
+  labelSingular: 'Configuração Precatur',
+  labelPlural: 'Configurações Precatur',
+  icon: 'IconSettings',
+  description: 'Configurações das automações Precatur (editadas em Configurações → Regras de etapa)',
+};
+const SETTINGS_FIELDS = [
+  { type: 'TEXT', name: 'chave', label: 'Chave', icon: 'IconKey' },
+  { type: 'RAW_JSON', name: 'valor', label: 'Valor', icon: 'IconBraces' },
+];
+if (objectByName(SETTINGS_OBJECT.nameSingular)) {
+  console.log('  objeto já existe');
+} else {
+  await run('criar objeto de configurações', () =>
+    metadata(`mutation($input: CreateOneObjectInput!) { createOneObject(input: $input) { id } }`, {
+      input: { object: SETTINGS_OBJECT },
+    }),
+  );
+  if (APPLY) await loadObjects();
+}
+const settingsObject = objectByName(SETTINGS_OBJECT.nameSingular);
+if (settingsObject) {
+  await ensureFields(settingsObject, SETTINGS_FIELDS);
+  const { navigationMenuItems: menuItems } = await metadata(
+    `query { navigationMenuItems { id targetObjectMetadataId } }`,
+  );
+  for (const item of menuItems.filter((menuItem) => menuItem.targetObjectMetadataId === settingsObject.id)) {
+    await run('tirar Configurações Precatur do menu', () =>
+      metadata(`mutation($id: UUID!) { deleteNavigationMenuItem(id: $id) { id } }`, { id: item.id }),
+    );
   }
 }
 

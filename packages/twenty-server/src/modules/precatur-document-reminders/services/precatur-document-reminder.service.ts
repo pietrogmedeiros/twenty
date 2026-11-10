@@ -1,10 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
-import { isNonEmptyString } from '@sniptt/guards';
 import { isDefined } from 'twenty-shared/utils';
 import { In } from 'typeorm';
 
-import { TwentyConfigService } from 'src/engine/core-modules/twenty-config/twenty-config.service';
 import { GlobalWorkspaceOrmManager } from 'src/engine/twenty-orm/global-workspace-datasource/global-workspace-orm.manager';
 import { buildSystemAuthContext } from 'src/engine/twenty-orm/utils/build-system-auth-context.util';
 import { PrecaturChatSystemMessageService } from 'src/modules/precatur-chat/services/precatur-chat-system-message.service';
@@ -14,6 +12,7 @@ import {
 } from 'src/modules/precatur-chat/utils/build-precatur-chat-system-message.util';
 import { PRECATUR_DOCUMENT_REMINDER } from 'src/modules/precatur-document-reminders/constants/precatur-document-reminder.constants';
 import { getPrecaturDocumentReminderAction } from 'src/modules/precatur-document-reminders/utils/get-precatur-document-reminder-action.util';
+import { getPrecaturSettingWorkspaceMemberId } from 'src/modules/precatur-document-reminders/utils/get-precatur-setting-workspace-member-id.util';
 import { PrecaturDocumentFolderService } from 'src/modules/precatur-documents/services/precatur-document-folder.service';
 import {
   getPrecaturMissingDocuments,
@@ -49,13 +48,10 @@ const getTodayInBrazil = (now: Date) =>
 
 @Injectable()
 export class PrecaturDocumentReminderService {
-  private readonly logger = new Logger(PrecaturDocumentReminderService.name);
-
   constructor(
     private readonly globalWorkspaceOrmManager: GlobalWorkspaceOrmManager,
     private readonly precaturDocumentFolderService: PrecaturDocumentFolderService,
     private readonly precaturChatSystemMessageService: PrecaturChatSystemMessageService,
-    private readonly twentyConfigService: TwentyConfigService,
   ) {}
 
   // Análise entrou na Pré Análise: (re)começa a contagem. Se os documentos já
@@ -267,28 +263,31 @@ export class PrecaturDocumentReminderService {
     return new Map(members.map((member) => [member.id, member]));
   }
 
-  // Gestor comercial: pessoa fixa configurada por e-mail no ambiente
+  // Gestor comercial: escolhido em Configurações → Regras de etapa
+  // (objeto configuracaoPrecatur, valor { workspaceMemberId })
   private async getManager(workspaceId: string) {
-    const email = this.twentyConfigService.get(
-      'PRECATUR_DOCUMENT_REMINDER_MANAGER_EMAIL',
-    );
+    const settingRepository =
+      await this.globalWorkspaceOrmManager.getRepository<{
+        id: string;
+        chave: string | null;
+        valor: unknown;
+      }>(workspaceId, PRECATUR_DOCUMENT_REMINDER.settingsObjectName, {
+        shouldBypassPermissionChecks: true,
+      });
+    const setting = await settingRepository.findOne({
+      where: { chave: PRECATUR_DOCUMENT_REMINDER.managerSettingKey },
+    });
+    const managerId = getPrecaturSettingWorkspaceMemberId(setting?.valor);
 
-    if (!isNonEmptyString(email)) {
+    if (!isDefined(managerId)) {
       return null;
     }
 
     const memberRepository = await this.getMemberRepository(workspaceId);
-    const manager = await memberRepository.findOne({
-      where: { userEmail: email.trim().toLowerCase() },
-    });
 
-    if (!isDefined(manager)) {
-      this.logger.warn(
-        `Document reminder manager ${email} is not a member of workspace ${workspaceId}`,
-      );
-    }
-
-    return manager ?? null;
+    return (
+      (await memberRepository.findOne({ where: { id: managerId } })) ?? null
+    );
   }
 
   private getMemberRepository(workspaceId: string) {

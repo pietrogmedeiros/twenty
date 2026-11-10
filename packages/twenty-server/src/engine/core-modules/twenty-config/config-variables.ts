@@ -2062,15 +2062,6 @@ export class ConfigVariables {
   PRECATUR_FOLLOW_UP_TEMPLATE_LANGUAGE = 'pt_BR';
 
   @ConfigVariablesMetadata({
-    group: ConfigVariablesGroup.PRECATUR_AUTOMATIONS,
-    description:
-      'E-mail of the commercial manager warned once after 5 business days of pending documents',
-    type: ConfigVariableType.STRING,
-  })
-  @IsOptional()
-  PRECATUR_DOCUMENT_REMINDER_MANAGER_EMAIL: string;
-
-  @ConfigVariablesMetadata({
     group: ConfigVariablesGroup.AWS_SES_SETTINGS,
     isSensitive: true,
     description: 'AWS secret access key',

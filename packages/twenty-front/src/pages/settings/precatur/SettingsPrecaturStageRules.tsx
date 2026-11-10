@@ -1,5 +1,6 @@
 import { useObjectMetadataItems } from '@/object-metadata/hooks/useObjectMetadataItems';
 import { getPrecaturDocumentRuleCandidates } from '@/precatur-documents/utils/getPrecaturDocumentRuleCandidates';
+import { PrecaturDocumentReminderManagerSection } from '@/precatur-settings/components/PrecaturDocumentReminderManagerSection';
 import { PrecaturStageRuleStageCard } from '@/precatur-stage-rules/components/PrecaturStageRuleStageCard';
 import { PRECATUR_STAGE_RULE_OBJECT_NAME } from '@/precatur-stage-rules/constants/PrecaturStageRuleObjectName';
 import { useIsPrecaturStageRulesEnabled } from '@/precatur-stage-rules/hooks/useIsPrecaturStageRulesEnabled';
@@ -21,6 +22,7 @@ import { FieldMetadataType } from '~/generated-metadata/graphql';
 // Objetos técnicos do próprio CRM que não são pipelines
 const NON_PIPELINE_OBJECT_NAMES = new Set([
   PRECATUR_STAGE_RULE_OBJECT_NAME,
+  'configuracaoPrecatur',
   'mensagemChat',
   'leituraChat',
 ]);
@@ -222,6 +224,7 @@ const SettingsPrecaturStageRulesContent = () => {
           ))}
         </StyledStages>
       </Section>
+      <PrecaturDocumentReminderManagerSection />
     </>
   );
 };
