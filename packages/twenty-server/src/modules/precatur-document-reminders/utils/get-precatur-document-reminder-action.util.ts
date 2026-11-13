@@ -7,14 +7,14 @@ export type PrecaturDocumentReminderAction =
 
 // O cron só roda em dia útil, então cada execução conta um dia útil
 export const getPrecaturDocumentReminderAction = ({
-  isInStartStage,
+  isStopped,
   missingCount,
   sentCount,
   lastSentOn,
   today,
   maxReminders,
 }: {
-  isInStartStage: boolean;
+  isStopped: boolean;
   missingCount: number;
   sentCount: number;
   lastSentOn: string | null;
@@ -25,7 +25,7 @@ export const getPrecaturDocumentReminderAction = ({
     return 'RESOLVE';
   }
 
-  if (!isInStartStage) {
+  if (isStopped) {
     return 'CLOSE';
   }
 

@@ -1,7 +1,7 @@
 import { getPrecaturDocumentReminderAction } from 'src/modules/precatur-document-reminders/utils/get-precatur-document-reminder-action.util';
 
 const base = {
-  isInStartStage: true,
+  isStopped: false,
   missingCount: 2,
   sentCount: 0,
   lastSentOn: null,
@@ -40,9 +40,9 @@ describe('getPrecaturDocumentReminderAction', () => {
     ).toBe('RESOLVE');
   });
 
-  it('should close when the analysis left the pre-analysis with documents missing', () => {
+  it('should close when the analysis was rejected with documents missing', () => {
     expect(
-      getPrecaturDocumentReminderAction({ ...base, isInStartStage: false }),
+      getPrecaturDocumentReminderAction({ ...base, isStopped: true }),
     ).toBe('CLOSE');
   });
 });

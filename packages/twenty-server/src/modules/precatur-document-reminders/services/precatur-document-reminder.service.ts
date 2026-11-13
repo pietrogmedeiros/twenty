@@ -118,8 +118,9 @@ export class PrecaturDocumentReminderService {
         });
         const sentCount = analysis.cobrancaDocumentosEnviadas ?? 0;
         const action = getPrecaturDocumentReminderAction({
-          isInStartStage:
-            analysis.status === PRECATUR_DOCUMENT_REMINDER.startStage,
+          isStopped: PRECATUR_DOCUMENT_REMINDER.stopStages.includes(
+            analysis.status ?? '',
+          ),
           missingCount: missing.length,
           sentCount,
           lastSentOn: analysis.cobrancaDocumentosUltimaEm,

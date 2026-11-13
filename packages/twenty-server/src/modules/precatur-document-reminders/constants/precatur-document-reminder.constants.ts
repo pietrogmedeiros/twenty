@@ -1,12 +1,15 @@
-// Cobrança diária de documentos (jurídico, nov/2026): enquanto a Análise
-// Jurídica está na Pré Análise sem os documentos exigidos para a Due, o
-// responsável comercial é cobrado no bate-papo do negócio por 5 dias úteis;
-// depois o gestor comercial é avisado uma vez e a cobrança encerra.
+// Cobrança diária de documentos (jurídico, nov/2026): começa quando a Análise
+// Jurídica entra na Pré Análise e, enquanto faltar documento exigido para a
+// Due, cobra o responsável comercial no bate-papo do negócio por 5 dias úteis;
+// depois o gestor comercial é avisado uma vez e a cobrança encerra. Continua
+// mesmo se a análise sair da Pré Análise (a Due só vem depois do aceite, e o
+// comercial já junta os documentos enquanto negocia); só para se reprovar.
 // Campos criados por precatur-build/criar-direito-creditorio.mjs
 export const PRECATUR_DOCUMENT_REMINDER = {
   analysisObjectName: 'analiseJuridica',
   stageFieldName: 'status',
   startStage: 'PRE_ANALISE_AUTOMATICA',
+  stopStages: ['REPROVADO'] as readonly string[],
   // Etapa cuja regra define os documentos cobrados
   ruleStage: 'DUE',
   fallbackRuleItems: [
