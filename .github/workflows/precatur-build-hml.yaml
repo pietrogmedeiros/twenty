@@ -41,6 +41,10 @@ jobs:
           target: twenty
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/twenty-precatur:${{ inputs.tag || 'hml' }}
+          # A tag com o commit permite promover para o PRD exatamente a
+          # versão testada no HML (precatur-promover-prd.yaml)
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/twenty-precatur:${{ inputs.tag || 'hml' }}
+            ghcr.io/${{ github.repository_owner }}/twenty-precatur:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
