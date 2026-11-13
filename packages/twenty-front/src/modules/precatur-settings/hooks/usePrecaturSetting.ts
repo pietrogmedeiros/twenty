@@ -23,9 +23,11 @@ export const usePrecaturSetting = ({
 
   const filter = useMemo(() => ({ chave: { eq: key } }), [key]);
 
-  const { records, loading } = useFindManyRecords<PrecaturSetting>({
+  // Mais recente primeiro: o servidor lê a mesma gravação
+  const { records, loading, refetch } = useFindManyRecords<PrecaturSetting>({
     objectNameSingular: PRECATUR_SETTINGS.objectName,
     filter,
+    orderBy: [{ updatedAt: 'DescNullsLast' }],
     recordGqlFields: PRECATUR_SETTINGS.recordGqlFields,
     skip: !isEnabled,
   });
@@ -50,6 +52,8 @@ export const usePrecaturSetting = ({
     }
 
     await createOneRecord({ name: label, chave: key, valor });
+    // Sem recarregar, a próxima troca criaria outra gravação em vez de atualizar
+    await refetch();
   };
 
   return { isEnabled, loading, value: setting?.valor, saveValue };

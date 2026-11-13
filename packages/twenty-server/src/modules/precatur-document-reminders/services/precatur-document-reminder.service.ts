@@ -272,11 +272,14 @@ export class PrecaturDocumentReminderService {
         id: string;
         chave: string | null;
         valor: unknown;
+        updatedAt: string;
       }>(workspaceId, PRECATUR_DOCUMENT_REMINDER.settingsObjectName, {
         shouldBypassPermissionChecks: true,
       });
+    // Vale a gravação mais recente (a tela usa a mesma ordem)
     const setting = await settingRepository.findOne({
       where: { chave: PRECATUR_DOCUMENT_REMINDER.managerSettingKey },
+      order: { updatedAt: 'DESC' },
     });
     const managerId = getPrecaturSettingWorkspaceMemberId(setting?.valor);
 

@@ -22,6 +22,8 @@ import {
   isPrecaturDocumentRuleItem,
 } from 'src/modules/precatur-documents/utils/get-precatur-missing-documents.util';
 import { PRECATUR_STAGE_RULE_OBJECT_NAME } from 'src/modules/precatur-stage-rules/constants/precatur-stage-rule-object-name.constant';
+import { PRECATUR_STAGE_RULE_OUTCOME_STAGES } from 'src/modules/precatur-stage-rules/constants/precatur-stage-rule-outcome-stages.constant';
+import { getPrecaturStagesToValidate } from 'src/modules/precatur-stage-rules/utils/get-precatur-stages-to-validate.util';
 import { isPrecaturStageRuleFieldFilled } from 'src/modules/precatur-stage-rules/utils/is-precatur-stage-rule-field-filled.util';
 
 type StageRuleRecord = {
@@ -299,28 +301,18 @@ export class PrecaturStageRuleValidatorService {
     const missingFieldLabels = new Set<string>();
 
     for (const record of records) {
-      const currentOption = options.find(
-        (option) => option.value === record[stageField.name],
+      const requiredFieldNames = new Set(
+        getPrecaturStagesToValidate({
+          options,
+          currentValue: record[stageField.name] as string | null | undefined,
+          targetValue: targetOption.value,
+          outcomeStages: PRECATUR_STAGE_RULE_OUTCOME_STAGES,
+        }).flatMap((stage) => requiredFieldNamesByStage.get(stage) ?? []),
       );
-      const currentPosition = currentOption?.position ?? -Infinity;
 
-      // Voltar ou manter a etapa é sempre permitido
-      if (targetOption.position <= currentPosition) {
+      if (requiredFieldNames.size === 0) {
         continue;
       }
-
-      // Pular etapas não dribla a regra: acumula as etapas atravessadas
-      const requiredFieldNames = new Set(
-        options
-          .filter(
-            (option) =>
-              option.position > currentPosition &&
-              option.position <= targetOption.position,
-          )
-          .flatMap(
-            (option) => requiredFieldNamesByStage.get(option.value) ?? [],
-          ),
-      );
 
       const recordAfterUpdate = mergeRecordWithUpdate(record, data);
 
