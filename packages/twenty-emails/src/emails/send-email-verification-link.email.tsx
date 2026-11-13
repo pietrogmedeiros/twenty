@@ -22,8 +22,8 @@ export const SendEmailVerificationLinkEmail = ({
     ? i18n._('Confirm your new email address')
     : i18n._('Confirm your email address');
   const bodyId = isEmailUpdate
-    ? 'We received a request to change the email address associated with your Twenty account. Click below to confirm this change.'
-    : 'Thanks for registering for an account on Twenty! Before we get started, we just need to confirm that this is you. Click below to verify your email address.';
+    ? 'Recebemos um pedido para trocar o e-mail da sua conta no CRM da Precatur. Clique abaixo para confirmar a troca.'
+    : 'Obrigado por criar sua conta no CRM da Precatur! Antes de começar, precisamos confirmar que é você. Clique abaixo para verificar seu e-mail.';
   const ctaLabel = isEmailUpdate
     ? i18n._('Confirm new email')
     : i18n._('Verify Email');

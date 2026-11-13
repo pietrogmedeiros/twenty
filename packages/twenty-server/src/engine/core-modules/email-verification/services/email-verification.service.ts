@@ -134,7 +134,7 @@ export class EmailVerificationService {
     const emailVerificationMsg =
       verificationTrigger === EmailVerificationTrigger.EMAIL_UPDATE
         ? msg`Please confirm your updated email`
-        : msg`Welcome to Twenty: Please Confirm Your Email`;
+        : msg`Bem-vindo ao CRM da Precatur: confirme seu e-mail`;
     const i18n = this.i18nService.getI18nInstance(locale);
     const subject = i18n._(emailVerificationMsg);
 

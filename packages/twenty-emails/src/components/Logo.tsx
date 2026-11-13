@@ -7,8 +7,9 @@ const logoStyle = {
 export const Logo = () => {
   return (
     <Img
-      src="https://app.twenty.com/images/icons/windows11/Square150x150Logo.scale-100.png"
-      alt="Twenty logo"
+      // Precatur: escudo servido pelo próprio CRM de produção
+      src="https://crm.precatur.pro/images/icons/windows11/Square150x150Logo.scale-100.png"
+      alt="Precatur"
       width="40"
       height="40"
       style={logoStyle}
