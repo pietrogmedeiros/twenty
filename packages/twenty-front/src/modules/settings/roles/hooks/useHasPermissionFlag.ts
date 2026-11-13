@@ -16,6 +16,12 @@ export const useHasPermissionFlag = (
     return true;
   }
 
+  // Precatur: o chat de IA nativo ("Nova conversa"/"Bate-papos") fica oculto
+  // para todos, inclusive Admin — o bate-papo interno é o chat do CRM
+  if (permissionFlagKey === PermissionFlagType.AI) {
+    return false;
+  }
+
   if (
     permissionFlagKey === PermissionFlagType.WORKSPACE &&
     currentWorkspace?.activationStatus ===

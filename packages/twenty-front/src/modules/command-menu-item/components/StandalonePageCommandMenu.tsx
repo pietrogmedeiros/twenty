@@ -20,7 +20,10 @@ import {
 } from 'twenty-shared/types';
 import { evaluateConditionalAvailabilityExpression } from 'twenty-shared/utils';
 import { useIsMobile } from 'twenty-ui/utilities';
-import { CommandMenuItemAvailabilityType } from '~/generated-metadata/graphql';
+import {
+  CommandMenuItemAvailabilityType,
+  PermissionFlagType,
+} from '~/generated-metadata/graphql';
 
 export const StandalonePageCommandMenu = () => {
   const store = useStore();
@@ -45,6 +48,10 @@ export const StandalonePageCommandMenu = () => {
     const permissionFlags: Record<string, boolean> = {};
 
     for (const flag of currentUserWorkspace?.permissionFlags ?? []) {
+      // Precatur: comandos de IA nativa ("Ask AI") ocultos para todos
+      if (flag === PermissionFlagType.AI) {
+        continue;
+      }
       permissionFlags[flag] = true;
     }
 

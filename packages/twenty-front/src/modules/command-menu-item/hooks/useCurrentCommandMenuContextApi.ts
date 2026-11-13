@@ -1,3 +1,4 @@
+import { PermissionFlagType } from '~/generated-metadata/graphql';
 import { currentUserState } from '@/auth/states/currentUserState';
 import { currentUserWorkspaceState } from '@/auth/states/currentUserWorkspaceState';
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
@@ -149,6 +150,10 @@ export const useCurrentCommandMenuContextApi = (): CommandMenuContextApi => {
   const permissionFlags: Record<string, boolean> = {};
 
   for (const flag of currentUserWorkspace?.permissionFlags ?? []) {
+    // Precatur: comandos de IA nativa ("Ask AI") ocultos para todos
+    if (flag === PermissionFlagType.AI) {
+      continue;
+    }
     permissionFlags[flag] = true;
   }
 
